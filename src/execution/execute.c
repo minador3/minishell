@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/09 16:09:18 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/10 15:36:03 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,19 @@ void execute_pipeline(t_command *cmd_list, char **envp)
 
     while (cmd_list != NULL)
     {
-        // 1. Create a pipe if there is a next command
+        // --- 1. PARENT BUILT-IN INTERCEPTOR ---
+        // If there are no pipes (it's a single command) and it's a built-in, execute it in the parent!
+        // We do this so commands like 'cd' actually change the parent shell's directory.
+        if (cmd_list->next == NULL && prev_read_fd == -1 && cmd_list->args && is_builtin(cmd_list->args[0]))
+        {
+            // Note: In the future, you will want to temporarily apply redirections here too
+            execute_builtin(cmd_list, envp);
+            cmd_list = cmd_list->next;
+            continue; // Skip the fork completely!
+        }
+
+        // --- 2. PIPES ---
+        // Create a pipe if there is a next command in the list
         if (cmd_list->next != NULL)
         {
             if (pipe(fd) == -1)
@@ -32,7 +44,7 @@ void execute_pipeline(t_command *cmd_list, char **envp)
             }
         }
 
-        // 2. Fork the process
+        // --- 3. FORK ---
         pid = fork();
         if (pid == -1)
         {
@@ -60,10 +72,19 @@ void execute_pipeline(t_command *cmd_list, char **envp)
             // C. File Redirections (These happen AFTER pipes, so ">" overrides "|")
             handle_redirections(cmd_list);
 
-            // D. Execute the command
+            // D. Safety check: Did the user just type "> file.txt" with no command?
             if (cmd_list->args == NULL || cmd_list->args[0] == NULL)
                 exit(0);
 
+            // E. Child Built-in Interceptor
+            // If it's part of a pipe (e.g., "pwd | grep /"), it runs in the child
+            if (is_builtin(cmd_list->args[0]))
+            {
+                execute_builtin(cmd_list, envp);
+                exit(0); // Built-in finished, kill the child process cleanly
+            }
+
+            // F. Execute External Commands (ls, grep, cat, etc.)
             path = get_path(cmd_list->args[0], envp);
             if (!path)
             {
@@ -96,7 +117,8 @@ void execute_pipeline(t_command *cmd_list, char **envp)
         cmd_list = cmd_list->next;
     }
 
-    // 3. Wait for all child processes to finish before returning to the prompt
+    // --- 4. WAIT ---
+    // Wait for all child processes to finish before returning to the prompt
     while (waitpid(-1, &status, 0) > 0)
         ;
 }
