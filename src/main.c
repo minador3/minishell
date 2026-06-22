@@ -6,76 +6,151 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 16:48:21 by weimin            #+#    #+#             */
-/*   Updated: 2026/06/22 13:02:56 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/22 15:54:37 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// A dummy function to simulate the parser for now
-t_command *mock_parser()
+// Minimal parser: split the input line by spaces into a single command
+t_command *parse_input(char *line, t_env **env_list)
 {
-    // --- COMMAND 1: ls fake_file ---
-    t_command *cmd1 = malloc(sizeof(t_command));
-    cmd1->args = malloc(sizeof(char *) * 3); 
-    cmd1->args[0] = "ls";
-    cmd1->args[1] = "does_not_exist.txt";
-    cmd1->args[2] = NULL;
-    cmd1->infile = NULL;
-    cmd1->outfile = NULL;
-    cmd1->append = 0;
-    cmd1->heredoc = NULL;
+    char **tokens;
+    int i;
+    int count = 0;
+    t_command *cmd;
 
-    // --- COMMAND 2: env ---
-    t_command *cmd2 = malloc(sizeof(t_command));
-    cmd2->args = malloc(sizeof(char *) * 2); 
-    cmd2->args[0] = "env";
-    cmd2->args[1] = NULL;
-    cmd2->infile = NULL;
-    cmd2->outfile = NULL;
-    cmd2->append = 0;
-    cmd2->heredoc = NULL;
-    cmd2->next = NULL;
+    (void)env_list;
+    tokens = ft_split(line, ' ');
+    if (!tokens)
+        return (NULL);
 
-    // We do NOT link them with a pipe this time. 
-    // We want to run them sequentially to simulate hitting 'enter' twice.
-    return (cmd1); // We will just return cmd1 for now
+    while (tokens[count])
+        count++;
+    if (count == 0)
+    {
+        free(tokens);
+        return (NULL);
+    }
+
+    cmd = malloc(sizeof(t_command));
+    if (!cmd)
+    {
+        i = 0;
+        while (tokens[i])
+            free(tokens[i++]);
+        free(tokens);
+        return (NULL);
+    }
+    cmd->args = malloc(sizeof(char *) * (count + 1));
+    if (!cmd->args)
+    {
+        free(cmd);
+        i = 0;
+        while (tokens[i])
+            free(tokens[i++]);
+        free(tokens);
+        return (NULL);
+    }
+
+    i = 0;
+    while (i < count)
+    {
+        cmd->args[i] = ft_strdup(tokens[i]);
+        free(tokens[i]);
+        i++;
+    }
+    free(tokens);
+    cmd->args[i] = NULL;
+    cmd->infile = NULL;
+    cmd->outfile = NULL;
+    cmd->append = 0;
+    cmd->heredoc = NULL;
+    cmd->next = NULL;
+    return (cmd);
 }
 
-// ---> DELETED the old void execute_pipeline(...) line from here! <---
+// Free a linked list of t_command and all allocated internals
+static void free_cmd_list(t_command *head)
+{
+    t_command *tmp;
+    int i;
+
+    while (head)
+    {
+        tmp = head->next;
+        if (head->args)
+        {
+            i = 0;
+            while (head->args[i])
+            {
+                free(head->args[i]);
+                i++;
+            }
+            free(head->args);
+        }
+        if (head->infile)
+            free(head->infile);
+        if (head->outfile)
+            free(head->outfile);
+        if (head->heredoc)
+            free(head->heredoc);
+        free(head);
+        head = tmp;
+    }
+}
 
 int main(int argc, char **argv, char **envp)
 {
-    // 1. Declare the environment list variable (fixes the 'undeclared identifier' error)
-    t_env *my_env;
+    t_env       *my_env;
+    char        *line;
+    t_command   *cmd_list;
 
-    // 2. Silence the compiler warnings for unused variables
     (void)argc;
     (void)argv;
 
-    // 3. Catch signals immediately so the shell is protected
+    // 1. Initialize system
     setup_signals();
-
-    // 4. Initialize your dynamic environment list
     my_env = init_env(envp);
 
-    // 5. Get the first command (ls fake_file)
-    t_command *cmd1 = mock_parser();
-    execute_pipeline(cmd1, envp, &my_env); 
+    // 2. The Main Interactive Loop
+    while (1)
+    {
+        // A. Display the prompt and wait for the user to type
+        line = readline("minishell$ ");
 
-    // 6. Simulate typing a second command (env)
-    t_command *cmd2 = malloc(sizeof(t_command));
-    cmd2->args = malloc(sizeof(char *) * 2); 
-    cmd2->args[0] = "env";
-    cmd2->args[1] = NULL;
-    cmd2->infile = NULL;
-    cmd2->outfile = NULL;
-    cmd2->append = 0;
-    cmd2->heredoc = NULL;
-    cmd2->next = NULL;
-    
-    // 7. Execute the second command
-    execute_pipeline(cmd2, envp, &my_env);
+        // B. Handle ctrl-D (EOF). Readline returns NULL if ctrl-D is pressed.
+        if (line == NULL)
+        {
+            printf("exit\n"); // Bash prints exit on ctrl-D
+            break;
+        }
 
+        // C. If the user actually typed something (not just hitting Enter)
+        if (*line != '\0')
+        {
+            // Add it to the bash history so they can use the up/down arrows
+            add_history(line);
+
+            // --- INTEGRATION POINT ---
+            // This is where your partner's code comes in! 
+            // It will look something like: cmd_list = parse_input(line, &my_env);
+            
+            cmd_list = mock_parser(); // Using the mock for now so it compiles
+
+            // D. Execute the parsed commands
+            if (cmd_list != NULL)
+            {
+                execute_pipeline(cmd_list, &my_env);
+                // Free the parsed command list to avoid leaking memory
+                free_cmd_list(cmd_list);
+            }
+        }
+        
+        // Readline mallocs the 'line' string, so we must free it at the end of every loop
+        free(line); 
+    }
+
+    // TODO: Free your my_env linked list here before the program completely exits
     return (0);
 }

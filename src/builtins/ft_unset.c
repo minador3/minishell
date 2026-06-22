@@ -24,14 +24,14 @@ static void free_env_node(t_env *node)
     free(node);
 }
 
-void ft_unset(t_command *cmd, t_env **env_list)
+int ft_unset(t_command *cmd, t_env **env_list)
 {
     int     i = 1;
     t_env   *curr;
     t_env   *prev;
 
     if (!env_list || !*env_list || !cmd->args[1])
-        return;
+        return (1);
 
     // Loop through all arguments (e.g., unset VAR1 VAR2 VAR3)
     while (cmd->args[i] != NULL)
@@ -57,4 +57,5 @@ void ft_unset(t_command *cmd, t_env **env_list)
         }
         i++;
     }
+    return (0);
 }

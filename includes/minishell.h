@@ -1,15 +1,17 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# define _XOPEN_SOURCE 700
+
 # include "../libft/libft.h"
 # include <fcntl.h> // Required for file operations like open()
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/wait.h>
 # include <unistd.h>
-# include <signal.h>
-# include <readline/readline.h>
-# include <readline/history.h>
 
 // Your core data structure
 typedef struct s_command
@@ -20,37 +22,41 @@ typedef struct s_command
 	int append;             // 1 for '>>', 0 for '>'
 	char *heredoc;          // string for '<<' or NULL
 	struct s_command *next; // Next command in the pipeline
-}		t_command;
+}					t_command;
 
 typedef struct s_env
 {
-    char            *key;   // e.g., "USER"
-    char            *value; // e.g., "mwei"
-    struct s_env    *next;
-} t_env;
+	char *key;   // e.g., "USER"
+	char *value; // e.g., "mwei"
+	struct s_env	*next;
+}					t_env;
 
 // --- Execution Prototypes ---
-void    execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list);
-char    *get_path(char *cmd, char **envp);
-void    handle_redirections(t_command *cmd);
-int     process_heredoc(char *delimiter); // Added heredoc prototype
+void				execute_pipeline(t_command *cmd_list, t_env **env_list);
+char				*get_path(char *cmd, char **envp);
+void				handle_redirections(t_command *cmd);
+int					process_heredoc(char *delimiter);
 
 // --- Builtin Prototypes ---
-int     is_builtin(char *cmd_name);
-void    execute_builtin(t_command *cmd, char **envp, t_env **env_list);
-void    ft_pwd(void);
-void    ft_cd(t_command *cmd);
-void    ft_echo(t_command *cmd);
-void    ft_env(char **envp);
-void    ft_exit(t_command *cmd);
-void    ft_export(t_command *cmd, t_env **env_list);
-void    ft_unset(t_command *cmd, t_env **env_list);
+int					is_builtin(char *cmd_name);
+int					execute_builtin(t_command *cmd, char **envp,
+						t_env **env_list);
+int			ft_pwd(void);
+int			ft_cd(t_command *cmd, t_env **env_list);
+int			ft_echo(t_command *cmd);
+int			ft_env(char **envp);
+void			ft_exit(t_command *cmd);
+int			ft_export(t_command *cmd, t_env **env_list);
+int			ft_unset(t_command *cmd, t_env **env_list);
 
 // --- Env Prototypes ---
-t_env   *init_env(char **envp);
-t_env   *new_env_node(char *key, char *value);             // ADD THIS
-void    env_add_back(t_env **env_list, t_env *new_node);   // ADD THIS
+t_env				*init_env(char **envp);
+t_env				*new_env_node(char *key, char *value);
+void				env_add_back(t_env **env_list, t_env *new_node);
+char			*env_get_value(t_env *env_list, const char *key);
+int				env_set_value(t_env **env_list, const char *key, const char *value);
+char			**env_list_to_envp(t_env *env_list);
 
-void    setup_signals(void);
+void				setup_signals(void);
 
 #endif

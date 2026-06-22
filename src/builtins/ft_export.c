@@ -73,7 +73,7 @@ static void	add_or_update_env(t_env **env_list, char *arg)
 }
 
 // The Main Builtin
-void	ft_export(t_command *cmd, t_env **env_list)
+int	ft_export(t_command *cmd, t_env **env_list)
 {
 	int		i;
 	t_env	*temp;
@@ -91,7 +91,7 @@ void	ft_export(t_command *cmd, t_env **env_list)
 				printf("declare -x %s\n", temp->key);
 			temp = temp->next;
 		}
-		return ;
+		return (0);
 	}
 	// 2. Loop through arguments and add/update them
 	while (cmd->args[i] != NULL)
@@ -103,4 +103,5 @@ void	ft_export(t_command *cmd, t_env **env_list)
 			add_or_update_env(env_list, cmd->args[i]);
 		i++;
 	}
+	return (0);
 }

@@ -3,18 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:49 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/22 11:15:02 by weimin           ###   ########.fr       */
+/*   Updated: 2026/06/22 13:30:03 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <signal.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 
 /*
 ** Handles the SIGINT signal (ctrl-C).

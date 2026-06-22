@@ -6,13 +6,13 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:19 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/10 16:16:06 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/22 15:20:43 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void ft_echo(t_command *cmd)
+int ft_echo(t_command *cmd)
 {
     int i = 1;
     int n_flag = 0;
@@ -20,7 +20,7 @@ void ft_echo(t_command *cmd)
     if (cmd->args == NULL || cmd->args[1] == NULL)
     {
         printf("\n");
-        return;
+        return (0);
     }
 
     // Check for the -n flag(s)
@@ -39,11 +39,11 @@ void ft_echo(t_command *cmd)
         // If there is another argument after this one, print a space
         if (cmd->args[i + 1] != NULL)
             printf(" ");
-            
         i++;
     }
 
     // Print a newline ONLY if the -n flag was not triggered
     if (n_flag == 0)
         printf("\n");
+    return (0);
 }

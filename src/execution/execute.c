@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/22 11:19:01 by weimin           ###   ########.fr       */
+/*   Updated: 2026/06/22 15:20:20 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void update_exit_status(t_env **env_list, int status)
     // Convert the integer status to a string (e.g., 127 -> "127")
     status_str = ft_itoa(status);
     if (!status_str)
-        return;
+        return ;
 
     // Search the environment list to see if "?" already exists
     temp = *env_list;
@@ -47,7 +47,7 @@ void update_exit_status(t_env **env_list, int status)
     }
 }
 
-void execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list)
+void execute_pipeline(t_command *cmd_list, t_env **env_list)
 {
     int     fd[2];
     int     prev_read_fd = -1;
@@ -57,13 +57,24 @@ void execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list)
 
     while (cmd_list != NULL)
     {
+        char **envp_current = env_list_to_envp(*env_list);
         // --- 1. PARENT BUILT-IN INTERCEPTOR ---
         // If there are no pipes (it's a single command) and it's a built-in, execute it in the parent!
         // We do this so commands like 'cd' actually change the parent shell's directory.
-        if (cmd_list->next == NULL && prev_read_fd == -1 && cmd_list->args && is_builtin(cmd_list->args[0]))
+            if (cmd_list->next == NULL && prev_read_fd == -1 && cmd_list->args && is_builtin(cmd_list->args[0]))
         {
             // Note: In the future, you will want to temporarily apply redirections here too
-            execute_builtin(cmd_list, envp, env_list);
+                    int status = execute_builtin(cmd_list, envp_current, env_list);
+                // Save builtin status into env list as the last command result
+                update_exit_status(env_list, status);
+                    // free envp_current
+                    if (envp_current)
+                    {
+                        int i = 0;
+                        while (envp_current[i])
+                            free(envp_current[i++]);
+                        free(envp_current);
+                    }
             cmd_list = cmd_list->next;
             continue; // Skip the fork completely!
         }
@@ -115,22 +126,37 @@ void execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list)
             // If it's part of a pipe (e.g., "pwd | grep /"), it runs in the child
             if (is_builtin(cmd_list->args[0]))
             {
-                execute_builtin(cmd_list, envp, env_list);
-                exit(0); // Built-in finished, kill the child process cleanly
+                int status = execute_builtin(cmd_list, envp_current, env_list);
+                // free envp_current in child before exiting
+                if (envp_current)
+                {
+                    int i = 0;
+                    while (envp_current[i])
+                        free(envp_current[i++]);
+                    free(envp_current);
+                }
+                exit(status); // Built-in finished, exit child with status
             }
 
             // F. Execute External Commands (ls, grep, cat, etc.)
-            path = get_path(cmd_list->args[0], envp);
+            path = get_path(cmd_list->args[0], envp_current);
             if (!path)
             {
                 printf("minishell: %s: command not found\n", cmd_list->args[0]);
                 exit(127);
             }
 
-            if (execve(path, cmd_list->args, envp) == -1)
+            if (execve(path, cmd_list->args, envp_current) == -1)
             {
                 perror("execve failed");
                 free(path);
+                if (envp_current)
+                {
+                    int i = 0;
+                    while (envp_current[i])
+                        free(envp_current[i++]);
+                    free(envp_current);
+                }
                 exit(126);
             }
         }
@@ -146,6 +172,14 @@ void execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list)
                 prev_read_fd = fd[0];
                 close(fd[1]); // The parent never writes to the pipe!
             }
+        }
+        // free envp_current in parent for this iteration
+        if (envp_current)
+        {
+            int i = 0;
+            while (envp_current[i])
+                free(envp_current[i++]);
+            free(envp_current);
         }
 
         // Move to the next command in the linked list
