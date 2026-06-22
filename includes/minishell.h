@@ -30,6 +30,7 @@ typedef struct s_env
 void    execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list);
 char    *get_path(char *cmd, char **envp);
 void    handle_redirections(t_command *cmd);
+int     process_heredoc(char *delimiter); // Added heredoc prototype
 
 // --- Builtin Prototypes ---
 int     is_builtin(char *cmd_name);

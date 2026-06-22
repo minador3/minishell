@@ -6,7 +6,7 @@
 /*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 16:48:21 by weimin            #+#    #+#             */
-/*   Updated: 2026/06/22 11:00:04 by weimin           ###   ########.fr       */
+/*   Updated: 2026/06/22 11:07:56 by weimin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,32 +15,21 @@
 // A dummy function to simulate the parser for now
 t_command *mock_parser()
 {
-    // --- COMMAND 1: export NEW_VAR=42_Abu_Dhabi ---
-    t_command *cmd1 = malloc(sizeof(t_command));
-    cmd1->args = malloc(sizeof(char *) * 3); 
-    cmd1->args[0] = "export";
-    cmd1->args[1] = "NEW_VAR=42_Abu_Dhabi";
-    cmd1->args[2] = NULL;
-    cmd1->infile = NULL;
-    cmd1->outfile = NULL;
-    cmd1->append = 0;
-    cmd1->heredoc = NULL;
-
-    // --- COMMAND 2: env ---
-    t_command *cmd2 = malloc(sizeof(t_command));
-    cmd2->args = malloc(sizeof(char *) * 2); 
-    cmd2->args[0] = "env";
-    cmd2->args[1] = NULL;
-    cmd2->infile = NULL;
-    cmd2->outfile = NULL;
-    cmd2->append = 0;
-    cmd2->heredoc = NULL;
-    cmd2->next = NULL;
-
-    // Link them!
-    cmd1->next = cmd2;
+    t_command *cmd = malloc(sizeof(t_command));
     
-    return (cmd1);
+    cmd->args = malloc(sizeof(char *) * 2); 
+    cmd->args[0] = "cat"; // We will feed the heredoc into cat
+    cmd->args[1] = NULL;
+    
+    cmd->infile = NULL;
+    cmd->outfile = NULL;
+    cmd->append = 0;
+    
+    // Set the delimiter! 
+    cmd->heredoc = "EOF";
+    cmd->next = NULL;
+    
+    return (cmd);
 }
 
 // ---> DELETED the old void execute_pipeline(...) line from here! <---
