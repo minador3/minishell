@@ -7,6 +7,9 @@
 # include <stdlib.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <signal.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 
 // Your core data structure
 typedef struct s_command
@@ -47,5 +50,7 @@ void    ft_unset(t_command *cmd, t_env **env_list);
 t_env   *init_env(char **envp);
 t_env   *new_env_node(char *key, char *value);             // ADD THIS
 void    env_add_back(t_env **env_list, t_env *new_node);   // ADD THIS
+
+void    setup_signals(void);
 
 #endif

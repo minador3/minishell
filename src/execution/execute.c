@@ -6,11 +6,46 @@
 /*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/17 16:56:47 by weimin           ###   ########.fr       */
+/*   Updated: 2026/06/22 11:19:01 by weimin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+// Helper to update the "$?" variable in the environment
+void update_exit_status(t_env **env_list, int status)
+{
+    char    *status_str;
+    t_env   *temp;
+    int     found = 0;
+
+    // Convert the integer status to a string (e.g., 127 -> "127")
+    status_str = ft_itoa(status);
+    if (!status_str)
+        return;
+
+    // Search the environment list to see if "?" already exists
+    temp = *env_list;
+    while (temp != NULL)
+    {
+        if (ft_strncmp(temp->key, "?", 2) == 0)
+        {
+            if (temp->value)
+                free(temp->value);
+            temp->value = status_str;
+            found = 1;
+            break;
+        }
+        temp = temp->next;
+    }
+
+    // If "?" wasn't in the list (first time running a command), add it!
+    if (!found)
+    {
+        char *key = ft_strdup("?");
+        env_add_back(env_list, new_env_node(key, status_str));
+    }
+}
 
 void execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list)
 {
@@ -119,6 +154,28 @@ void execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list)
 
     // --- 4. WAIT ---
     // Wait for all child processes to finish before returning to the prompt
-    while (waitpid(-1, &status, 0) > 0)
+    // ... inside execute_pipeline, right after the main while loop finishes:
+
+    int final_status = 0;
+    
+    // We only care about the status of the VERY LAST child we forked
+    // 'pid' currently holds the Process ID of the final command in the pipeline
+    if (pid != -1 && pid != 0)
+    {
+        waitpid(pid, &status, 0);
+
+        // Standard Unix macros to extract the exact exit code
+        if (WIFEXITED(status))
+            final_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            final_status = 128 + WTERMSIG(status); // Handles commands killed by signals (like ctrl-C)
+    }
+
+    // Wait for any other remaining background child processes from the pipe to finish
+    while (waitpid(-1, NULL, 0) > 0)
         ;
+
+    // Save the final_status into our environment list so the parser can read it!
+    update_exit_status(env_list, final_status);
 }
+
