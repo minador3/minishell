@@ -19,19 +19,32 @@ typedef struct s_command
 	struct s_command *next; // Next command in the pipeline
 }		t_command;
 
+typedef struct s_env
+{
+    char            *key;   // e.g., "USER"
+    char            *value; // e.g., "mwei"
+    struct s_env    *next;
+} t_env;
+
 // --- Execution Prototypes ---
-void    execute_pipeline(t_command *cmd_list, char **envp);
+void    execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list);
 char    *get_path(char *cmd, char **envp);
 void    handle_redirections(t_command *cmd);
 
 // --- Builtin Prototypes ---
 int     is_builtin(char *cmd_name);
-void    execute_builtin(t_command *cmd, char **envp);
+void    execute_builtin(t_command *cmd, char **envp, t_env **env_list);
 void    ft_pwd(void);
 void    ft_cd(t_command *cmd);
 void    ft_echo(t_command *cmd);
 void    ft_env(char **envp);
 void    ft_exit(t_command *cmd);
-void    ft_export(t_command *cmd, char **envp);
+void    ft_export(t_command *cmd, t_env **env_list);
+void    ft_unset(t_command *cmd, t_env **env_list);
+
+// --- Env Prototypes ---
+t_env   *init_env(char **envp);
+t_env   *new_env_node(char *key, char *value);             // ADD THIS
+void    env_add_back(t_env **env_list, t_env *new_node);   // ADD THIS
 
 #endif

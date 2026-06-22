@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/10 15:36:03 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/17 16:56:47 by weimin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void execute_pipeline(t_command *cmd_list, char **envp)
+void execute_pipeline(t_command *cmd_list, char **envp, t_env **env_list)
 {
     int     fd[2];
     int     prev_read_fd = -1;
@@ -28,7 +28,7 @@ void execute_pipeline(t_command *cmd_list, char **envp)
         if (cmd_list->next == NULL && prev_read_fd == -1 && cmd_list->args && is_builtin(cmd_list->args[0]))
         {
             // Note: In the future, you will want to temporarily apply redirections here too
-            execute_builtin(cmd_list, envp);
+            execute_builtin(cmd_list, envp, env_list);
             cmd_list = cmd_list->next;
             continue; // Skip the fork completely!
         }
@@ -80,7 +80,7 @@ void execute_pipeline(t_command *cmd_list, char **envp)
             // If it's part of a pipe (e.g., "pwd | grep /"), it runs in the child
             if (is_builtin(cmd_list->args[0]))
             {
-                execute_builtin(cmd_list, envp);
+                execute_builtin(cmd_list, envp, env_list);
                 exit(0); // Built-in finished, kill the child process cleanly
             }
 
