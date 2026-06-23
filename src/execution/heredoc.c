@@ -3,55 +3,53 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:40 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/22 11:06:54 by weimin           ###   ########.fr       */
+/*   Updated: 2026/06/23 17:31:58 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 
-// Captures input until the delimiter is found, returns a file descriptor containing the text
-int process_heredoc(char *delimiter)
+// Helper to isolate the error printing and save lines
+static int	heredoc_error(void)
 {
-    int     fd[2];
-    char    *line;
+	perror("minishell: heredoc pipe");
+	return (-1);
+}
 
-    // Create a pipe to hold the user's input in memory
-    if (pipe(fd) == -1)
-    {
-        perror("minishell: heredoc pipe");
-        return (-1);
-    }
+// Helper to prevent file descriptor leaks if ctrl-C is pressed!
+static int	clean_exit(int *fd, char *line, int ret)
+{
+	if (line)
+		free(line);
+	close(fd[0]);
+	close(fd[1]);
+	return (ret);
+}
 
-    while (1)
-    {
-        // Readline automatically handles the standard bash "> " prompt for heredocs
-        line = readline("> ");
-        
-        // If ctrl-D is pressed (EOF), line is NULL, so we break
-        if (!line)
-            break;
+int	process_heredoc(char *delimiter)
+{
+	int		fd[2];
+	char	*line;
 
-        // If the user types the exact delimiter, we stop reading
-        if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
-        {
-            free(line);
-            break;
-        }
-
-        // Write the line into our pipe, followed by a newline character
-        write(fd[1], line, ft_strlen(line));
-        write(fd[1], "\n", 1);
-        free(line);
-    }
-
-    // Crucial: Close the write end of the pipe, or the command reading from it will hang forever!
-    close(fd[1]);
-
-    // Return the read end so the command can use it as input
-    return (fd[0]);
+	if (pipe(fd) == -1)
+		return (heredoc_error());
+	while (1)
+	{
+		g_sig = 0;
+		line = readline("> ");
+		if (g_sig == SIGINT)
+			return (clean_exit(fd, line, -1));
+		if (!line || ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+			break ;
+		write(fd[1], line, ft_strlen(line));
+		write(fd[1], "\n", 1);
+		free(line);
+	}
+	if (line)
+		free(line);
+	close(fd[1]);
+	return (fd[0]);
 }

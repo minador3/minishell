@@ -2,6 +2,7 @@
 # define MINISHELL_H
 
 # define _XOPEN_SOURCE 700
+extern int g_sig;
 
 # include "../libft/libft.h"
 # include <fcntl.h> // Required for file operations like open()
@@ -36,28 +37,31 @@ void				execute_pipeline(t_command *cmd_list, t_env **env_list);
 char				*get_path(char *cmd, char **envp);
 void				handle_redirections(t_command *cmd);
 int					process_heredoc(char *delimiter);
+void				update_exit_status(t_env **env_list, int status);
+void				free_envp_array(char **envp);
+void				wait_for_children(pid_t last_pid, t_env **env_list);
 
 // --- Builtin Prototypes ---
-int					is_builtin(char *cmd_name);
-int					execute_builtin(t_command *cmd, char **envp,
-						t_env **env_list);
-int			ft_pwd(void);
-int			ft_cd(t_command *cmd, t_env **env_list);
-int			ft_echo(t_command *cmd);
-int			ft_env(char **envp);
-void			ft_exit(t_command *cmd);
-int			ft_export(t_command *cmd, t_env **env_list);
-int			ft_unset(t_command *cmd, t_env **env_list);
+int     is_builtin(char *cmd_name);
+int     execute_builtin(t_command *cmd, char **envp, t_env **env_list);
+int     ft_pwd(void);
+int     ft_cd(t_command *cmd, t_env **env_list);
+int     ft_echo(t_command *cmd);
+int     ft_env(t_env **env_list);
+void    ft_exit(t_command *cmd);
+int     ft_export(t_command *cmd, t_env **env_list);
+int     ft_unset(t_command *cmd, t_env **env_list);
 
 // --- Env Prototypes ---
 t_env				*init_env(char **envp);
 t_env				*new_env_node(char *key, char *value);
 void				env_add_back(t_env **env_list, t_env *new_node);
-char			*env_get_value(t_env *env_list, const char *key);
-int				env_set_value(t_env **env_list, const char *key, const char *value);
-char			**env_list_to_envp(t_env *env_list);
+char				*env_get_value(t_env *env_list, const char *key);
+int					env_set_value(t_env **env_list, const char *key,
+						const char *value);
+char				**env_list_to_envp(t_env *env_list);
 
-void update_shlvl(t_env env_list);
+void				update_shlvl(t_env **env_list);
 
 void				setup_signals(void);
 

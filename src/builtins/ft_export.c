@@ -3,25 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/10 16:15:27 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/22 10:57:38 by weimin           ###   ########.fr       */
+/*   Created: 2026/06/23 17:09:26 by mwei              #+#    #+#             */
+/*   Updated: 2026/06/23 17:17:03 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// Helper: Bash variables must start with a letter or underscore,
-// and only contain letters, numbers, or underscores.
-static int	is_valid_identifier(char *str)
+static int	is_valid_id(char *str)
 {
 	int	i;
 
 	i = 0;
 	if (!str || (!ft_isalpha(str[0]) && str[0] != '_'))
 		return (0);
-	while (str[i] != '=' && str[i] != '\0')
+	while (str[i] && str[i] != '=')
 	{
 		if (!ft_isalnum(str[i]) && str[i] != '_')
 			return (0);
@@ -30,78 +28,90 @@ static int	is_valid_identifier(char *str)
 	return (1);
 }
 
-// Helper: Extracts the key/value and adds/updates the linked list
-static void	add_or_update_env(t_env **env_list, char *arg)
+static void	print_export(t_env *env)
 {
-	char	*key;
-	char	*value;
-	char	*equals_sign;
-	t_env	*temp;
-
-	// 1. Split the argument safely using the first '='
-	equals_sign = ft_strchr(arg, '=');
-	if (equals_sign)
+	while (env)
 	{
-		key = ft_substr(arg, 0, equals_sign - arg);
-		value = ft_substr(equals_sign + 1, 0, ft_strlen(equals_sign + 1));
+		if (ft_strncmp(env->key, "?", 2) && ft_strncmp(env->key, "_", 2))
+		{
+			if (env->value)
+				printf("declare -x %s=\"%s\"\n", env->key, env->value);
+			else
+				printf("declare -x %s\n", env->key);
+		}
+		env = env->next;
+	}
+}
+
+static void	update_node(t_env **env, char *k, char *v)
+{
+	t_env	*tmp;
+
+	tmp = *env;
+	while (tmp)
+	{
+		if (ft_strncmp(tmp->key, k, ft_strlen(k) + 1) == 0)
+		{
+			if (v)
+			{
+				free(tmp->value);
+				tmp->value = ft_strdup(v);
+			}
+			free(k);
+			if (v)
+				free(v);
+			return ;
+		}
+		tmp = tmp->next;
+	}
+	env_add_back(env, new_env_node(k, v ? ft_strdup(v) : NULL));
+	if (v)
+		free(v);
+}
+
+static void	handle_arg(t_env **env, char *arg)
+{
+	char	*eq;
+	char	*k;
+	char	*v;
+
+	eq = ft_strchr(arg, '=');
+	if (eq)
+	{
+		k = ft_substr(arg, 0, eq - arg);
+		v = ft_substr(eq + 1, 0, ft_strlen(eq + 1));
 	}
 	else
 	{
-		key = ft_strdup(arg);
-		value = NULL; // No equals sign means no value (e.g., export VAR)
+		k = ft_strdup(arg);
+		v = NULL;
 	}
-	// 2. Check if the key already exists
-	temp = *env_list;
-	while (temp != NULL)
-	{
-		if (ft_strncmp(temp->key, key, ft_strlen(key) + 1) == 0)
-		{
-			// Key exists! Update value ONLY if a new one was provided
-			if (value != NULL)
-			{
-				if (temp->value)
-					free(temp->value);
-				temp->value = value;
-			}
-			free(key); // We didn't use the new key string, so free it
-			return ;
-		}
-		temp = temp->next;
-	}
-	// 3. If we get here, the key didn't exist. Add it to the end!
-	env_add_back(env_list, new_env_node(key, value));
+	update_node(env, k, v);
 }
 
-// The Main Builtin
-int	ft_export(t_command *cmd, t_env **env_list)
+int	ft_export(t_command *cmd, t_env **env)
 {
-	int		i;
-	t_env	*temp;
+	int	i;
+	int	status;
 
 	i = 1;
-	// 1. No arguments: Print the environment
-	if (cmd->args[1] == NULL)
+	status = 0;
+	if (!cmd->args[1])
+		print_export(*env);
+	else
 	{
-		temp = *env_list;
-		while (temp != NULL)
+		while (cmd->args[i])
 		{
-			if (temp->value)
-				printf("declare -x %s=\"%s\"\n", temp->key, temp->value);
+			if (!is_valid_id(cmd->args[i]))
+			{
+				printf("minishell: export: `%s': not a valid id\n",
+					cmd->args[i]);
+				status = 1;
+			}
 			else
-				printf("declare -x %s\n", temp->key);
-			temp = temp->next;
+				handle_arg(env, cmd->args[i]);
+			i++;
 		}
-		return (0);
 	}
-	// 2. Loop through arguments and add/update them
-	while (cmd->args[i] != NULL)
-	{
-		if (!is_valid_identifier(cmd->args[i]))
-			printf("minishell: export: `%s': not a valid identifier\n",
-				cmd->args[i]);
-		else
-			add_or_update_env(env_list, cmd->args[i]);
-		i++;
-	}
-	return (0);
+	return (status);
 }
