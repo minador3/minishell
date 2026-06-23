@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 16:48:21 by weimin            #+#    #+#             */
-/*   Updated: 2026/06/22 15:54:37 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/23 16:23:59 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,43 @@ static void free_cmd_list(t_command *head)
         head = tmp;
     }
 }
+void free_env_list(t_env *env_list)
+{
+    t_env *temp;
+    while (env_list != NULL)
+    {
+        temp = env_list->next;
+        if (env_list->key) free(env_list->key);
+        if (env_list->value) free(env_list->value);
+        free(env_list);
+        env_list = temp;
+    }
+}
+
+void free_cmd_list(t_command *cmd_list)
+{
+    t_command *temp;
+    int i;
+    while (cmd_list != NULL)
+    {
+        temp = cmd_list->next;
+        if (cmd_list->args)
+        {
+            i = 0;
+            while (cmd_list->args[i])
+            {
+                free(cmd_list->args[i]);
+                i++;
+            }
+            free(cmd_list->args);
+        }
+        if (cmd_list->infile) free(cmd_list->infile);
+        if (cmd_list->outfile) free(cmd_list->outfile);
+        if (cmd_list->heredoc) free(cmd_list->heredoc);
+        free(cmd_list);
+        cmd_list = temp;
+    }
+}
 
 int main(int argc, char **argv, char **envp)
 {
@@ -152,5 +189,6 @@ int main(int argc, char **argv, char **envp)
     }
 
     // TODO: Free your my_env linked list here before the program completely exits
+    free_env_list(my_env);
     return (0);
 }

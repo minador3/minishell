@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:37 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/22 11:18:52 by weimin           ###   ########.fr       */
+/*   Updated: 2026/06/23 16:21:55 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,3 +115,26 @@ char **env_list_to_envp(t_env *env_list)
 	return (envp);
 }
 
+// Increments the SHLVL variable, or sets it to 1 if it doesn't exist
+void update_shlvl(t_env **env_list)
+{
+    t_env   *temp;
+    int     level;
+    char    *new_level_str;
+
+    temp = *env_list;
+    while (temp != NULL)
+    {
+        if (ft_strncmp(temp->key, "SHLVL", 6) == 0)
+        {
+            level = ft_atoi(temp->value) + 1;
+            new_level_str = ft_itoa(level);
+            free(temp->value);
+            temp->value = new_level_str;
+            return;
+        }
+        temp = temp->next;
+    }
+    // If SHLVL wasn't found in the OS environment, create it
+    env_add_back(env_list, new_env_node(ft_strdup("SHLVL"), ft_strdup("1")));
+}

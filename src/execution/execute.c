@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/22 15:20:20 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/23 16:21:34 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,9 @@ void execute_pipeline(t_command *cmd_list, t_env **env_list)
 
         if (pid == 0) // --- CHILD PROCESS ---
         {
+            // Reset signals to default Unix behavior so ctrl-C kills this child
+            signal(SIGINT, SIG_DFL);
+            signal(SIGQUIT, SIG_DFL);
             // A. Receive input from the PREVIOUS command's pipe
             if (prev_read_fd != -1)
             {
@@ -185,31 +188,37 @@ void execute_pipeline(t_command *cmd_list, t_env **env_list)
         // Move to the next command in the linked list
         cmd_list = cmd_list->next;
     }
-
-    // --- 4. WAIT ---
-    // Wait for all child processes to finish before returning to the prompt
-    // ... inside execute_pipeline, right after the main while loop finishes:
+// --- ADD THESE TWO LINES ---
+    // Parent process ignores signals while the children are running
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
 
     int final_status = 0;
     
-    // We only care about the status of the VERY LAST child we forked
-    // 'pid' currently holds the Process ID of the final command in the pipeline
     if (pid != -1 && pid != 0)
     {
         waitpid(pid, &status, 0);
-
-        // Standard Unix macros to extract the exact exit code
         if (WIFEXITED(status))
             final_status = WEXITSTATUS(status);
         else if (WIFSIGNALED(status))
-            final_status = 128 + WTERMSIG(status); // Handles commands killed by signals (like ctrl-C)
+        {
+            final_status = 128 + WTERMSIG(status);
+            // If killed by ctrl-\ (SIGQUIT), bash prints "Quit (core dumped)"
+            if (WTERMSIG(status) == SIGQUIT)
+                printf("Quit (core dumped)\n");
+            // If killed by ctrl-C (SIGINT), bash prints a newline
+            else if (WTERMSIG(status) == SIGINT)
+                printf("\n");
+        }
     }
 
-    // Wait for any other remaining background child processes from the pipe to finish
     while (waitpid(-1, NULL, 0) > 0)
         ;
 
-    // Save the final_status into our environment list so the parser can read it!
+    // --- ADD THIS LINE ---
+    // Commands are done! Turn interactive signals back on
+    setup_signals(); 
+    
     update_exit_status(env_list, final_status);
 }
 

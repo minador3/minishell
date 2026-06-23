@@ -57,6 +57,8 @@ char			*env_get_value(t_env *env_list, const char *key);
 int				env_set_value(t_env **env_list, const char *key, const char *value);
 char			**env_list_to_envp(t_env *env_list);
 
+void update_shlvl(t_env env_list);
+
 void				setup_signals(void);
 
 #endif
