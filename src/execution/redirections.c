@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-void	handle_redirections(t_command *cmd)
+void	handle_redirections(t_cmd *cmd)
 {
 	int	fd;
 
@@ -28,9 +28,9 @@ void	handle_redirections(t_command *cmd)
 		}
 	}
 	// 2. Handle Infile (<) - Note: Only happens if there is NO heredoc!
-	else if (cmd->infile != NULL)
+	else if (cmd->input_file != NULL)
 	{
-		fd = open(cmd->infile, O_RDONLY);
+		fd = open(cmd->input_file, O_RDONLY);
 		if (fd == -1)
 		{
 			perror("minishell: input file");
@@ -40,12 +40,12 @@ void	handle_redirections(t_command *cmd)
 		close(fd);
 	}
 	// 3. Handle Outfile / Append (>, >>)
-	if (cmd->outfile != NULL)
+	if (cmd->output_file != NULL)
 	{
 		if (cmd->append == 1)
-			fd = open(cmd->outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			fd = open(cmd->output_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else
-			fd = open(cmd->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			fd = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd == -1)
 		{
 			perror("minishell: output file");

@@ -89,27 +89,27 @@ static void	handle_arg(t_env **env, char *arg)
 	update_node(env, k, v);
 }
 
-int	ft_export(t_command *cmd, t_env **env)
+int	ft_export(t_cmd *cmd, t_env **env)
 {
 	int	i;
 	int	status;
 
 	i = 1;
 	status = 0;
-	if (!cmd->args[1])
+	if (!cmd->argv[1])
 		print_export(*env);
 	else
 	{
-		while (cmd->args[i])
+		while (cmd->argv[i])
 		{
-			if (!is_valid_id(cmd->args[i]))
+			if (!is_valid_id(cmd->argv[i]))
 			{
 				printf("minishell: export: `%s': not a valid id\n",
-					cmd->args[i]);
+					cmd->argv[i]);
 				status = 1;
 			}
 			else
-				handle_arg(env, cmd->args[i]);
+				handle_arg(env, cmd->argv[i]);
 			i++;
 		}
 	}

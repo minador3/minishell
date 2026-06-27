@@ -23,11 +23,11 @@ static char	*get_env_val(t_env *env, char *key)
 	return (NULL);
 }
 
-int	ft_cd(t_command *cmd, t_env **env)
+int	ft_cd(t_cmd *cmd, t_env **env)
 {
 	char	*path;
 
-	if (cmd->args[1] == NULL)
+	if (cmd->argv[1] == NULL)
 	{
 		path = get_env_val(*env, "HOME");
 		if (!path)
@@ -37,7 +37,7 @@ int	ft_cd(t_command *cmd, t_env **env)
 		}
 	}
 	else
-		path = cmd->args[1];
+		path = cmd->argv[1];
 	if (chdir(path) != 0)
 	{
 		perror("minishell: cd");

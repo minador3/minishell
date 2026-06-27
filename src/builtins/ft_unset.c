@@ -24,20 +24,20 @@ static void	remove_node(t_env **env, t_env *node, t_env *prev)
 	free(node);
 }
 
-int	ft_unset(t_command *cmd, t_env **env)
+int	ft_unset(t_cmd *cmd, t_env **env)
 {
 	int		i;
 	t_env	*tmp;
 	t_env	*prev;
 
 	i = 1;
-	while (cmd->args[i])
+	while (cmd->argv[i])
 	{
 		tmp = *env;
 		prev = NULL;
 		while (tmp)
 		{
-			if (ft_strncmp(tmp->key, cmd->args[i], ft_strlen(cmd->args[i])
+			if (ft_strncmp(tmp->key, cmd->argv[i], ft_strlen(cmd->argv[i])
 					+ 1) == 0)
 			{
 				remove_node(env, tmp, prev);

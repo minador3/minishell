@@ -12,10 +12,10 @@
 
 #include "minishell.h"
 
-static int	handle_parent_builtin(t_command *cmd, t_env **env, char **envp,
+static int	handle_parent_builtin(t_cmd *cmd, t_env **env, char **envp,
 		int prev)
 {
-	if (!cmd->next && prev == -1 && cmd->args && is_builtin(cmd->args[0]))
+	if (!cmd->next && prev == -1 && cmd->argv && is_builtin(cmd->argv[0]))
 	{
 		update_exit_status(env, execute_builtin(cmd, envp, env));
 		free_envp_array(envp);
@@ -24,7 +24,7 @@ static int	handle_parent_builtin(t_command *cmd, t_env **env, char **envp,
 	return (0);
 }
 
-static void	handle_parent_process(t_command *cmd, int fd[2], int *prev_fd)
+static void	handle_parent_process(t_cmd *cmd, int fd[2], int *prev_fd)
 {
 	if (*prev_fd != -1)
 		close(*prev_fd);
@@ -35,7 +35,7 @@ static void	handle_parent_process(t_command *cmd, int fd[2], int *prev_fd)
 	}
 }
 
-static void	setup_child_pipes(t_command *cmd, int fd[2], int prev)
+static void	setup_child_pipes(t_cmd *cmd, int fd[2], int prev)
 {
 	if (prev != -1)
 	{
@@ -50,7 +50,7 @@ static void	setup_child_pipes(t_command *cmd, int fd[2], int prev)
 	}
 }
 
-static void	execute_child(t_command *cmd, t_env **env, char **envp, int fd[2],
+static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int fd[2],
 		int prev)
 {
 	char	*path;
@@ -59,21 +59,21 @@ static void	execute_child(t_command *cmd, t_env **env, char **envp, int fd[2],
 	signal(SIGQUIT, SIG_DFL);
 	setup_child_pipes(cmd, fd, prev);
 	handle_redirections(cmd);
-	if (cmd->args == NULL || cmd->args[0] == NULL)
+	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 		exit(0);
-	if (is_builtin(cmd->args[0]))
+	if (is_builtin(cmd->argv[0]))
 		exit(execute_builtin(cmd, envp, env));
-	path = get_path(cmd->args[0], envp);
+	path = get_path(cmd->argv[0], envp);
 	if (!path)
 	{
-		printf("minishell: %s: command not found\n", cmd->args[0]);
+		printf("minishell: %s: command not found\n", cmd->argv[0]);
 		exit(127);
 	}
-	execve(path, cmd->args, envp);
+	execve(path, cmd->argv, envp);
 	exit(126);
 }
 
-void	execute_pipeline(t_command *cmd, t_env **env_list)
+void	execute_pipeline(t_cmd *cmd, t_env **env_list)
 {
 	int		fd[2];
 	int		prev_fd;

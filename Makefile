@@ -29,7 +29,10 @@ SRCS        = $(SRC_DIR)/main.c \
               $(SRC_DIR)/execution/heredoc.c \
               $(SRC_DIR)/execution/path_resolver.c \
               $(SRC_DIR)/execution/redirections.c \
-              $(SRC_DIR)/signals/signals.c
+              $(SRC_DIR)/signals/signals.c \
+              $(SRC_DIR)/lexer/lexer.c \
+              $(SRC_DIR)/parse/parsing.c \
+              $(SRC_DIR)/utils/utils.c \
 
 # Object files (translates src/%.c to obj/%.o)
 OBJS        = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)

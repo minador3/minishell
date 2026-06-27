@@ -30,26 +30,26 @@ static int	is_numeric(char *str)
 	return (1);
 }
 
-void	ft_exit(t_command *cmd)
+void	ft_exit(t_cmd *cmd)
 {
 	int	code;
 
 	code = 0;
 	printf("exit\n");
-	if (cmd->args[1])
+	if (cmd->argv[1])
 	{
-		if (!is_numeric(cmd->args[1]))
+		if (!is_numeric(cmd->argv[1]))
 		{
 			printf("minishell: exit: %s: numeric argument required\n",
-				cmd->args[1]);
+				cmd->argv[1]);
 			exit(255);
 		}
-		if (cmd->args[2])
+		if (cmd->argv[2])
 		{
 			printf("minishell: exit: too many arguments\n");
 			return ;
 		}
-		code = ft_atoi(cmd->args[1]);
+		code = ft_atoi(cmd->argv[1]);
 	}
 	exit(code);
 }

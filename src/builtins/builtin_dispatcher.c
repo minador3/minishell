@@ -33,22 +33,22 @@ int	is_builtin(char *cmd_name)
 	return (0);
 }
 
-int	execute_builtin(t_command *cmd, char **envp, t_env **env_list)
+int	execute_builtin(t_cmd *cmd, char **envp, t_env **env_list)
 {
 	(void)envp;
-	if (ft_strncmp(cmd->args[0], "echo", 5) == 0)
+	if (ft_strncmp(cmd->argv[0], "echo", 5) == 0)
 		return (ft_echo(cmd));
-	if (ft_strncmp(cmd->args[0], "cd", 3) == 0)
+	if (ft_strncmp(cmd->argv[0], "cd", 3) == 0)
 		return (ft_cd(cmd, env_list));
-	if (ft_strncmp(cmd->args[0], "pwd", 4) == 0)
+	if (ft_strncmp(cmd->argv[0], "pwd", 4) == 0)
 		return (ft_pwd());
-	if (ft_strncmp(cmd->args[0], "export", 7) == 0)
+	if (ft_strncmp(cmd->argv[0], "export", 7) == 0)
 		return (ft_export(cmd, env_list));
-	if (ft_strncmp(cmd->args[0], "unset", 6) == 0)
+	if (ft_strncmp(cmd->argv[0], "unset", 6) == 0)
 		return (ft_unset(cmd, env_list));
-	if (ft_strncmp(cmd->args[0], "env", 4) == 0)
+	if (ft_strncmp(cmd->argv[0], "env", 4) == 0)
 		return (ft_env(env_list));
-	if (ft_strncmp(cmd->args[0], "exit", 5) == 0)
+	if (ft_strncmp(cmd->argv[0], "exit", 5) == 0)
 	{
 		ft_exit(cmd);
 		return (0);
