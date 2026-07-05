@@ -59,6 +59,14 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }	t_cmd;
 
+typedef struct s_word
+{
+    char    *str;
+    char    quote_state;
+    int     k;
+    t_env   *env_list;
+}   t_word;
+
 // --- Execution Prototypes ---
 void				execute_pipeline(t_cmd *cmd_list, t_env **env_list);
 char				*get_path(char *cmd, char **envp);
@@ -93,19 +101,26 @@ void				update_shlvl(t_env **env_list);
 void				setup_signals(void);
 
 // Lexer/token
-int types(char c);
-t_token *tokenizer(char *line, t_env *env_list);
+int 	types(char c);
+void    handle_operator(t_token **token, char *line, int *j);
+void    handle_heredoc(t_token **token, char *line, int *j);
+void    handle_expansion(t_word *w, char *line, int *j);
+void    handle_word(t_token **token, char *line, int *j, t_env *env_list);
+void    expand_exit_status(t_word *w, int *j);
+void    expand_variable(t_word *w, char *line, int *j);
+char    *extract_varname(char *line, int *j);
+void    fill_word(t_word *w, char *line, int *j);
 
 
 // parsing
-int is_redirection(int type);
-char *token_to_str(int type);
-int syntax_check(t_token *token);
-int count_args(t_token *token);
-int count_cmd_args(t_token *token);
-t_cmd *init_cmd(void);
-int allocate_cmd_arg(t_cmd *cmd, t_token *token);
-t_cmd *parse(t_token *token);
+int		is_redirection(int type);
+char	*token_to_str(int type);
+int		syntax_check(t_token *token);
+int		check_tokens(t_token *head);
+int		count_cmd_args(t_token *token);
+t_cmd	*init_cmd(void);
+int		allocate_cmd_arg(t_cmd *cmd, t_token *token);
+t_cmd	*parse(t_token *token);
 
 
 // utils
@@ -113,9 +128,10 @@ t_token *ft_lexernew(int type, char *str);
 void    ft_lexeradd_back(t_token **head, t_token *new);
 void	ft_listclear(t_token **lst);
 void	ft_listdelone(t_token *lst);
-void free_cmd(t_cmd *cmd);
+void	free_cmd(t_cmd *cmd);
 
 void	shell_loop(t_env **env_list);
+t_token	*tokenizer(char *line, t_env *env_list);
 
 
 #endif

@@ -1,153 +1,107 @@
 #include "minishell.h"
 
-int types(char c)
+void	handle_operator(t_token **token, char *line, int *j)
 {
-    if (c == '|' || c == '>' || c == '<' || c == ' ')
-        return (1);
-    return (0);
+	t_token	*new;
+
+	if (line[*j] == '>' && line[*j + 1] == '>')
+	{
+		new = ft_lexernew(APPEND, NULL);
+		ft_lexeradd_back(token, new);
+		*j += 2;
+		return ;
+	}
+	else if (line[*j] == '<')
+	{
+		new = ft_lexernew(REDIR_IN, NULL);
+		ft_lexeradd_back(token, new);
+	}
+	else if (line[*j] == '>')
+	{
+		new = ft_lexernew(REDIR_OUT, NULL);
+		ft_lexeradd_back(token, new);
+	}
+	else if (line[*j] == '|')
+	{
+		new = ft_lexernew(PIPE, NULL);
+		ft_lexeradd_back(token, new);
+	}
+	(*j)++;
 }
 
-
-t_token *tokenizer(char *line, t_env *env_list)
+void	handle_heredoc(t_token **token, char *line, int *j)
 {
-    int i;
-    int j;
-    int m;
-    int k;
-    char *str;
-    char *exit_str;
-    char *tmp;
-    char quote_state;
-    t_token *token = NULL;
-    t_token *new;
+	t_token	*new;
+	int		m;
+	char	*tmp;
 
-    i = 0;
-    j = 0;
-    quote_state = 0;
-    exit_str = NULL;
-    tmp = NULL;
-    while (line[j])
-    {
-        while (line[j] == ' ')
-            j++;
-        if (!line[j])
-            break;
-        if (!types(line[j]))
-        {
-            k = 0;
-            quote_state = 0;
+	tmp = NULL;
+	*j += 2;
+	while ((line[*j] >= 9 && line[*j] <= 13) || line[*j] == 32)
+		(*j)++;
+	tmp = malloc(ft_strlen(line) + 1);
+	if (!tmp)
+	{
+		ft_listclear(token);
+		return ;
+	}
+	m = 0;
+	while (ft_isalpha(line[*j]) || ft_isdigit(line[*j]) || line[*j] == '_')
+		tmp[m++] = line[(*j)++];
+	tmp[m] = '\0';
+	new = ft_lexernew(HEREDOC, tmp);
+	ft_lexeradd_back(token, new);
+	free(tmp);
+}
 
-            str = malloc(ft_strlen(line) + 1);
-            if (!str)
-            {
-                ft_listclear(&token);
-                return (NULL);
-            }
-            while (line[j] && (quote_state || !types(line[j])))
-            {
-                if (quote_state == 0 && (line[j] == '\'' || line[j] == '"'))
-                    quote_state = line[j];
-                else if (quote_state == line[j])
-                    quote_state = 0;
-                else if (line[j] == '$' && quote_state != '\'')
-                {
-                    if (line[j+1] == '?')
-                    {
-                        j += 2;
-                        exit_str = env_get_value(env_list, "?");
-                        if (exit_str)
-                        {
-                            i = 0;
-                            while (exit_str[i])
-                                str[k++] = exit_str[i++];
-                        }
-                        continue;
-                    }
-                    else
-                    {
-                        j++;
-                        i = j;
-                        while (ft_isalpha(line[j]) || ft_isdigit(line[j]) || line[j] == '_')
-                            j++;
-                        if (i == j)
-                        {
-                            str[k++] = '$';
-                            continue;
-                        }
-                        tmp = malloc(ft_strlen(line) + 1);
-                        if (!tmp)
-                        {
-                            free(str);
-                            ft_listclear(&token);
-                            return (NULL);
-                        }
-                        m = 0;
-                        while (i < j)
-                            tmp[m++] = line[i++];
-                        tmp[m] = '\0';
-                        exit_str = env_get_value(env_list, tmp);
-                        if (exit_str)
-                        {
-                            m = 0;
-                            while (exit_str[m])
-                                str[k++] = exit_str[m++];
-                        }
-                        free(tmp);
-                        continue;
-                    }
-                }
-                else
-                    str[k++] = line[j];
-                j++;
-            }
-            str[k] = '\0';
-            new = ft_lexernew(WORD, str);
-            ft_lexeradd_back(&token, new);
-            free(str);
-        }
-        else if (line[j] == '>' && line[j+1] == '>')
-        {
-            new = ft_lexernew(APPEND, NULL);
-            ft_lexeradd_back(&token, new);
-            j += 2;
-        }
-        else if (line[j] == '<' && line[j+1] == '<')
-        {
-            j += 2;
-            while ((line[j] >= 9 && line[j] <= 13) || line[j] == 32)
-                j++;
-            tmp = malloc(ft_strlen(line) + 1);
-            if (!tmp)
-            {
-                ft_listclear(&token);
-                return (NULL);
-            }
-            m = 0;
-            while (ft_isalpha(line[j]) || ft_isdigit(line[j]) || line[j] == '_')
-                tmp[m++] = line[j++];
-            tmp[m] = '\0';
-            new = ft_lexernew(HEREDOC, tmp);
-            ft_lexeradd_back(&token, new);
-            free(tmp);
-        }
-        else if (line[j] == '>')
-        {
-            new = ft_lexernew(REDIR_OUT, NULL);
-            ft_lexeradd_back(&token, new);
-            j++;
-        }
-        else if (line[j] == '<')
-        {
-            new = ft_lexernew(REDIR_IN, NULL);
-            ft_lexeradd_back(&token, new);
-            j++;
-        }
-        else if (line[j] == '|')
-        {
-            new = ft_lexernew(PIPE, NULL);
-            ft_lexeradd_back(&token, new);
-            j++;
-        }
-    }
-    return (token);
+void	handle_expansion(t_word *w, char *line, int *j)
+{
+	if (line[*j + 1] == '?')
+		expand_exit_status(w, j);
+	else
+		expand_variable(w, line, j);
+}
+
+void	handle_word(t_token **token, char *line, int *j, t_env *env_list)
+{
+	t_word	w;
+	t_token	*new;
+
+	w.k = 0;
+	w.quote_state = 0;
+	w.env_list = env_list;
+	w.str = malloc(ft_strlen(line) + 1);
+	if (!w.str)
+	{
+		ft_listclear(token);
+		return ;
+	}
+	fill_word(&w, line, j);
+	w.str[w.k] = '\0';
+	new = ft_lexernew(WORD, w.str);
+	ft_lexeradd_back(token, new);
+	free(w.str);
+}
+
+t_token	*tokenizer(char *line, t_env *env_list)
+{
+	int		j;
+	t_token	*token;
+
+	j = 0;
+	token = NULL;
+	while (line[j])
+	{
+		while (line[j] == ' ')
+			j++;
+		if (!line[j])
+			break ;
+		if (!types(line[j]))
+			handle_word(&token, line, &j, env_list);
+		else if (line[j] == '<' && line[j + 1] == '<')
+			handle_heredoc(&token, line, &j);
+		else
+			handle_operator(&token, line, &j);
+	}
+	return (token);
 }

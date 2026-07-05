@@ -30,58 +30,67 @@ void	free_env_list(t_env *env_list)
 	}
 }
 
+t_token	*get_tokens(char *input, t_env **env_list)
+{
+	t_token	*token;
+
+	token = tokenizer(input, *env_list);
+	if (token == NULL)
+		return (NULL);
+	if (syntax_check(token))
+	{
+		ft_listclear(&token);
+		return (NULL);
+	}
+	return (token);
+}
+
+void	process_input(char *input, t_env **env_list)
+{
+	t_cmd	*cmd;
+	t_token	*token;
+
+	token = NULL;
+	cmd = NULL;
+	add_history(input);
+	token = get_tokens(input, env_list);
+	if (!token)
+		return ;
+	cmd = parse(token);
+	if (!cmd)
+	{
+		ft_listclear(&token);
+		return ;
+	}
+	execute_pipeline(cmd, env_list);
+	free_cmd(cmd);
+	ft_listclear(&token);
+}
+
 void	shell_loop(t_env **env_list)
 {
-	char *input;
-    t_token *token;
-    t_cmd *cmd;
+	char	*input;
 
 	while (1)
 	{
-        input = readline("Minishell>$ ");
-        if (input == NULL)
-            exit(0);
-        if (strlen(input) > 0)
-        {
-            token = NULL;
-            cmd = NULL;
-            add_history(input);
-            token = tokenizer(input, *env_list);
-            if (token == NULL)
-            {
-                free(input);
-                continue;
-            }
-            if (syntax_check(token))
-            {
-                free(input);
-                ft_listclear(&token);
-                continue;
-            }
-            cmd = parse(token);
-            if (!cmd)
-            {
-                free(input);
-                ft_listclear(&token);
-                continue;
-            }
-            execute_pipeline(cmd, env_list);
-            free_cmd(cmd);
-            ft_listclear(&token);
-        }
-	    free(input);
+		input = readline("Minishell>$ ");
+		if (input == NULL)
+			exit(0);
+		if (ft_strlen(input) > 0)
+			process_input(input, env_list);
+		free(input);
 	}
 }
 
-int main(int ac, char **av, char **env)
+int	main(int ac, char **av, char **env)
 {
 	t_env		*my_env;
 
 	(void)ac;
 	(void)av;
-	setup_signals();              // from her main
-    my_env = init_env(env);      // from her main
-    shell_loop(&my_env);          // yours, but now takes t_env **
-    free_env_list(my_env);        // from her main
-    return (0);
+	setup_signals();
+	my_env = init_env(env);
+	shell_loop(&my_env);
+	free_env_list(my_env);
+	return (0);
 }
