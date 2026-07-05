@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:31:49 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/29 15:03:49 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,40 +24,39 @@ static int	handle_parent_builtin(t_cmd *cmd, t_env **env, char **envp,
 	return (0);
 }
 
-static void	handle_parent_process(t_cmd *cmd, int fd[2], int *prev_fd)
+static void	handle_parent_process(t_cmd *cmd, int p[3])
 {
-	if (*prev_fd != -1)
-		close(*prev_fd);
+	if (p[2] != -1)
+		close(p[2]);
 	if (cmd->next != NULL)
 	{
-		*prev_fd = fd[0];
-		close(fd[1]);
+		p[2] = p[0];
+		close(p[1]);
 	}
 }
 
-static void	setup_child_pipes(t_cmd *cmd, int fd[2], int prev)
+static void	setup_child_pipes(t_cmd *cmd, int p[3])
 {
-	if (prev != -1)
+	if (p[2] != -1)
 	{
-		dup2(prev, STDIN_FILENO);
-		close(prev);
+		dup2(p[2], STDIN_FILENO);
+		close(p[2]);
 	}
 	if (cmd->next != NULL)
 	{
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[1]);
-		close(fd[0]);
+		dup2(p[1], STDOUT_FILENO);
+		close(p[1]);
+		close(p[0]);
 	}
 }
 
-static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int fd[2],
-		int prev)
+static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 {
 	char	*path;
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
-	setup_child_pipes(cmd, fd, prev);
+	setup_child_pipes(cmd, p);
 	handle_redirections(cmd);
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 		exit(0);
@@ -75,27 +74,26 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int fd[2],
 
 void	execute_pipeline(t_cmd *cmd, t_env **env_list)
 {
-	int		fd[2];
-	int		prev_fd;
+	int		p[3];
 	pid_t	pid;
 	char	**envp;
 
-	prev_fd = -1;
+	p[2] = -1;
 	pid = -1;
 	while (cmd != NULL)
 	{
 		envp = env_list_to_envp(*env_list);
-		if (handle_parent_builtin(cmd, env_list, envp, prev_fd))
+		if (handle_parent_builtin(cmd, env_list, envp, p[2]))
 		{
 			cmd = cmd->next;
 			continue ;
 		}
 		if (cmd->next != NULL)
-			pipe(fd);
+			pipe(p);
 		pid = fork();
 		if (pid == 0)
-			execute_child(cmd, env_list, envp, fd, prev_fd);
-		handle_parent_process(cmd, fd, &prev_fd);
+			execute_child(cmd, env_list, envp, p);
+		handle_parent_process(cmd, p);
 		free_envp_array(envp);
 		cmd = cmd->next;
 	}

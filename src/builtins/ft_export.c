@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/23 17:09:26 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:17:03 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/29 14:02:50 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,7 @@ static void	update_node(t_env **env, char *k, char *v)
 		}
 		tmp = tmp->next;
 	}
-	env_add_back(env, new_env_node(k, v ? ft_strdup(v) : NULL));
-	if (v)
-		free(v);
+	env_add_back(env, new_env_node(k, v));
 }
 
 static void	handle_arg(t_env **env, char *arg)

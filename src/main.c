@@ -6,13 +6,13 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/23 17:03:36 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:27:25 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/29 15:15:16 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int			g_sig = 0;
+int		g_sig = 0;
 
 void	free_env_list(t_env *env_list)
 {
@@ -84,7 +84,7 @@ void	shell_loop(t_env **env_list)
 
 int	main(int ac, char **av, char **env)
 {
-	t_env		*my_env;
+	t_env	*my_env;
 
 	(void)ac;
 	(void)av;

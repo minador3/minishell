@@ -6,28 +6,25 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 15:29:51 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:21:41 by mwei             ###   ########.fr       */
+/*   Updated: 2026/06/29 15:09:50 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	handle_redirections(t_cmd *cmd)
+static void	handle_input(t_cmd *cmd)
 {
 	int	fd;
 
-	// 1. Handle Heredoc (<<)
 	if (cmd->heredoc != NULL)
 	{
 		fd = process_heredoc(cmd->heredoc);
 		if (fd != -1)
 		{
 			dup2(fd, STDIN_FILENO);
-				// Reroute standard input to our heredoc pipe
 			close(fd);
 		}
 	}
-	// 2. Handle Infile (<) - Note: Only happens if there is NO heredoc!
 	else if (cmd->input_file != NULL)
 	{
 		fd = open(cmd->input_file, O_RDONLY);
@@ -39,7 +36,12 @@ void	handle_redirections(t_cmd *cmd)
 		dup2(fd, STDIN_FILENO);
 		close(fd);
 	}
-	// 3. Handle Outfile / Append (>, >>)
+}
+
+static void	handle_output(t_cmd *cmd)
+{
+	int	fd;
+
 	if (cmd->output_file != NULL)
 	{
 		if (cmd->append == 1)
@@ -51,7 +53,13 @@ void	handle_redirections(t_cmd *cmd)
 			perror("minishell: output file");
 			exit(1);
 		}
-		dup2(fd, STDOUT_FILENO); // Reroute standard output to the file
+		dup2(fd, STDOUT_FILENO);
 		close(fd);
 	}
+}
+
+void	handle_redirections(t_cmd *cmd)
+{
+	handle_input(cmd);
+	handle_output(cmd);
 }
