@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/29 15:03:49 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/07 03:46:11 by weimin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	setup_child_pipes(cmd, p);
-	handle_redirections(cmd);
+	handle_redirections(cmd, *env);
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 		exit(0);
 	if (is_builtin(cmd->argv[0]))
@@ -65,8 +65,10 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 	path = get_path(cmd->argv[0], envp);
 	if (!path)
 	{
-		printf("minishell: %s: command not found\n", cmd->argv[0]);
-		exit(127);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+        ft_putstr_fd(cmd->argv[0], STDERR_FILENO);
+        ft_putendl_fd(": command not found", STDERR_FILENO);
+        exit(127);
 	}
 	execve(path, cmd->argv, envp);
 	exit(126);

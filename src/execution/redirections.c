@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 15:29:51 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/29 15:09:50 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/07 03:51:04 by weimin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	handle_input(t_cmd *cmd)
+static void	handle_input(t_cmd *cmd, t_env *env_list)
 {
 	int	fd;
 
 	if (cmd->heredoc != NULL)
 	{
-		fd = process_heredoc(cmd->heredoc);
+		fd = process_heredoc(cmd->heredoc, env_list);
 		if (fd != -1)
 		{
 			dup2(fd, STDIN_FILENO);
@@ -58,8 +58,8 @@ static void	handle_output(t_cmd *cmd)
 	}
 }
 
-void	handle_redirections(t_cmd *cmd)
+void	handle_redirections(t_cmd *cmd, t_env *env_list)
 {
-	handle_input(cmd);
+	handle_input(cmd, env_list);
 	handle_output(cmd);
 }

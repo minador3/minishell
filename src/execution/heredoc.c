@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:40 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:31:58 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/07 03:48:04 by weimin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static int	clean_exit(int *fd, char *line, int ret)
 	return (ret);
 }
 
-int	process_heredoc(char *delimiter)
+int	process_heredoc(char *delimiter, t_env *env_list)
 {
 	int		fd[2];
 	char	*line;

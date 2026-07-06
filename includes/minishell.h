@@ -14,17 +14,6 @@ extern int g_sig;
 # include <sys/wait.h>
 # include <unistd.h>
 
-// Your core data structure
-// typedef struct s_command
-// {
-// 	char **args;            // e.g., {"ls", "-l", NULL}
-// 	char *infile;           // e.g., "input.txt" or NULL
-// 	char *outfile;          // e.g., "output.txt" or NULL
-// 	int append;             // 1 for '>>', 0 for '>'
-// 	char *heredoc;          // string for '<<' or NULL
-// 	struct s_command *next; // Next command in the pipeline
-// }					t_command;
-
 typedef struct s_env
 {
 	char *key;   // e.g., "USER"
@@ -70,8 +59,8 @@ typedef struct s_word
 // --- Execution Prototypes ---
 void				execute_pipeline(t_cmd *cmd_list, t_env **env_list);
 char				*get_path(char *cmd, char **envp);
-void				handle_redirections(t_cmd *cmd);
-int					process_heredoc(char *delimiter);
+void				handle_redirections(t_cmd *cmd, t_env *env_list);
+int					process_heredoc(char *delimiter, t_env *env_list);
 void				update_exit_status(t_env **env_list, int status);
 void				free_envp_array(char **envp);
 void				wait_for_children(pid_t last_pid, t_env **env_list);
