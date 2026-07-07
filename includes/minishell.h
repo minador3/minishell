@@ -61,6 +61,7 @@ void				execute_pipeline(t_cmd *cmd_list, t_env **env_list);
 char				*get_path(char *cmd, char **envp);
 void				handle_redirections(t_cmd *cmd, t_env *env_list);
 int					process_heredoc(char *delimiter, t_env *env_list);
+char	*expand_heredoc_line(char *line, t_env *env);
 void				update_exit_status(t_env **env_list, int status);
 void				free_envp_array(char **envp);
 void				wait_for_children(pid_t last_pid, t_env **env_list);

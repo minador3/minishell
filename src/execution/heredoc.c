@@ -6,7 +6,7 @@
 /*   By: weimin <weimin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:40 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/07 03:48:04 by weimin           ###   ########.fr       */
+/*   Updated: 2026/07/07 12:09:51 by weimin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ int	process_heredoc(char *delimiter, t_env *env_list)
 			return (clean_exit(fd, line, -1));
 		if (!line || ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
 			break ;
+		line = expand_heredoc_line(line, env_list);
 		write(fd[1], line, ft_strlen(line));
 		write(fd[1], "\n", 1);
 		free(line);

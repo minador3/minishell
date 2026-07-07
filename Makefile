@@ -27,6 +27,7 @@ SRCS        = $(SRC_DIR)/main.c \
               $(SRC_DIR)/execution/execute.c \
               $(SRC_DIR)/execution/execute_utils.c \
               $(SRC_DIR)/execution/heredoc.c \
+              $(SRC_DIR)/execution/heredoc_utils.c \
               $(SRC_DIR)/execution/path_resolver.c \
               $(SRC_DIR)/execution/redirections.c \
               $(SRC_DIR)/signals/signals.c \
