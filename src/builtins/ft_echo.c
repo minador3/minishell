@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:19 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:16:51 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/07 17:28:02 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,12 @@ int	ft_echo(t_cmd *cmd)
 	}
 	while (cmd->argv[i])
 	{
-		printf("%s", cmd->argv[i]);
+		ft_putstr_fd(cmd->argv[i], STDOUT_FILENO);
 		if (cmd->argv[i + 1])
-			printf(" ");
+			ft_putstr_fd(" ", STDOUT_FILENO);
 		i++;
 	}
 	if (!n_flag)
-		printf("\n");
+		ft_putstr_fd("\n", STDOUT_FILENO);
 	return (0);
 }

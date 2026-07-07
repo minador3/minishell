@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:22 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:16:56 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/07 17:29:42 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,11 @@ int	ft_env(t_env **env_list)
 	while (temp != NULL)
 	{
 		if (temp->value != NULL)
-			printf("%s=%s\n", temp->key, temp->value);
+		{
+			ft_putstr_fd(temp->key, STDOUT_FILENO);
+			ft_putstr_fd("=", STDOUT_FILENO);
+			ft_putendl_fd(temp->value, STDOUT_FILENO);
+		}
 		temp = temp->next;
 	}
 	return (0);

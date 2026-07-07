@@ -32,7 +32,10 @@ SRCS        = $(SRC_DIR)/main.c \
               $(SRC_DIR)/execution/redirections.c \
               $(SRC_DIR)/signals/signals.c \
               $(SRC_DIR)/lexer/lexer.c \
+              $(SRC_DIR)/lexer/lexer_utils.c \
               $(SRC_DIR)/parse/parsing.c \
+              $(SRC_DIR)/parse/parse_utils1.c \
+              $(SRC_DIR)/parse/parse_utils2.c \
               $(SRC_DIR)/utils/utils.c \
 
 # Object files (translates src/%.c to obj/%.o)
