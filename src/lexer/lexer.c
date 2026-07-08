@@ -92,7 +92,7 @@ t_token	*tokenizer(char *line, t_env *env_list)
 	token = NULL;
 	while (line[j])
 	{
-		while (line[j] == ' ')
+		while (line[j] == ' ' || (line[j] >= 9 && line[j] <= 13))
 			j++;
 		if (!line[j])
 			break ;

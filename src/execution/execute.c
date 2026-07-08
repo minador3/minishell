@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/07 17:58:07 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/07 23:40:30 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ static void	setup_child_pipes(t_cmd *cmd, int p[3])
 static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 {
 	char	*path;
+	struct stat	path_stat;
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
@@ -76,16 +77,20 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 		exit(0);
 	if (is_builtin(cmd->argv[0]))
-		exit(execute_builtin(cmd, envp, env));
+		exit(execute_builtin(cmd, envp, env)) ;
 	path = get_path(cmd->argv[0], envp);
-	if (!path)
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-        ft_putstr_fd(cmd->argv[0], STDERR_FILENO);
-        ft_putendl_fd(": command not found", STDERR_FILENO);
-        exit(127);
+	if (!path){
+		if (ft_strchr(cmd->argv[0], '/') || env_get_value(*env, "PATH") == NULL)
+			cmd_error_exit(cmd->argv[0], ": No such file or directory", NULL, 127);
+		else
+			cmd_error_exit(cmd->argv[0], ": command not found", NULL, 127);
 	}
+	if (stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
+		cmd_error_exit(path, ": Is a directory", path, 126);
 	execve(path, cmd->argv, envp);
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	perror(path);
+	free(path);
 	exit(126);
 }
 

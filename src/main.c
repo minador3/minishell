@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/23 17:03:36 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/29 15:15:16 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/07 19:19:14 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,10 @@ void	shell_loop(t_env **env_list)
 	{
 		input = readline("Minishell>$ ");
 		if (input == NULL)
-			exit(0);
+		{
+			ft_putendl_fd("exit", STDOUT_FILENO);
+			break ;
+		}
 		if (ft_strlen(input) > 0)
 			process_input(input, env_list);
 		free(input);
