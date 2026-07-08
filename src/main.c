@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/23 17:03:36 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/07 19:19:14 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/08 14:21:32 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,26 +45,28 @@ t_token	*get_tokens(char *input, t_env **env_list)
 	return (token);
 }
 
-void	process_input(char *input, t_env **env_list)
+int	process_input(char *input, t_env **env_list)
 {
 	t_cmd	*cmd;
 	t_token	*token;
+	int ret;
 
 	token = NULL;
 	cmd = NULL;
 	add_history(input);
 	token = get_tokens(input, env_list);
 	if (!token)
-		return ;
+		return (0);
 	cmd = parse(token);
 	if (!cmd)
 	{
 		ft_listclear(&token);
-		return ;
+		return (0);
 	}
-	execute_pipeline(cmd, env_list);
+	ret = execute_pipeline(cmd, env_list);
 	free_cmd(cmd);
 	ft_listclear(&token);
+	return (ret);
 }
 
 void	shell_loop(t_env **env_list)
@@ -80,7 +82,13 @@ void	shell_loop(t_env **env_list)
 			break ;
 		}
 		if (ft_strlen(input) > 0)
-			process_input(input, env_list);
+		{
+			if (process_input(input, env_list) == -2)
+			{
+				free(input);
+				break ;
+			}
+		}
 		free(input);
 	}
 }
@@ -88,12 +96,18 @@ void	shell_loop(t_env **env_list)
 int	main(int ac, char **av, char **env)
 {
 	t_env	*my_env;
+	char *val;
+	int code;
 
 	(void)ac;
 	(void)av;
 	setup_signals();
 	my_env = init_env(env);
 	shell_loop(&my_env);
+	val = env_get_value(my_env, "?");
+	code = 0;
+	if (val)
+		code = ft_atoi(val);
 	free_env_list(my_env);
-	return (0);
+	return (code);
 }

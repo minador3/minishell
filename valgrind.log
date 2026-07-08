@@ -1,183 +1,37 @@
-==2603693== Memcheck, a memory error detector
-==2603693== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==2603693== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
-==2603693== Command: /usr/bin/cat Makefile
-==2603693== Parent PID: 2603534
-==2==2603534== 
-==2603534== FILE DESCRIPTORS: 10 open (3 std) at exit.
-==2603534== Open file descriptor 5: /dev/pts/0
-==2603534==    at 0x49D906B: dup (syscall-template.S:120)
-==2603534==    by 0x10AADD: handle_parent_builtin (execute.c:24)
-==2603534==    by 0x10AF20: execute_pipeline (execute.c:108)
-==2603534==    by 0x10965E: process_input (main.c:65)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== Open file descriptor 4: /dev/pts/0
-==2603534==    at 0x49D906B: dup (syscall-template.S:120)
-==2603534==    by 0x10AAD0: handle_parent_builtin (execute.c:23)
-==2603534==    by 0x10AF20: execute_pipeline (execute.c:108)
-==2603534==    by 0x10965E: process_input (main.c:65)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== Open file descriptor 103: /usr/share/code/v8_context_snapshot.bin
-==2603534==    <inherited from parent>
-==2603534== 
-==2603534== Open file descriptor 45: /home/mwei/.config/Code/logs/20260708T130346/ptyhost.log
-==2603534==    <inherited from parent>
-==2603534== 
-==2603534== Open pf-16 socket 38:
-==2603534==    <inherited from parent>
-==2603534== 
-==2603534== Open file descriptor 37:
-==2603534==    <inherited from parent>
-==2603534== 
-==2603534== Open file descriptor 3: /home/mwei/42Projects/merge_shell/valgrind.log
-==2603534==    <inherited from parent>
-==2603534== 
-==2603534== 
-==2603534== HEAP SUMMARY:
-==2603534==     in use at exit: 219,512 bytes in 541 blocks
-==2603534==   total heap usage: 1,174 allocs, 633 frees, 286,941 bytes allocated
-==2603534== 
-==2603534== 1 bytes in 1 blocks are still reachable in loss record 1 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10DA65: ft_strdup (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10D641: ft_substr (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10A573: parse_and_add_env (env_init.c:55)
-==2603534==    by 0x10A6F1: init_env (env_init.c:97)
-==2603534==    by 0x109735: main (main.c:95)
-==2603534== 
-==2603534== 2 bytes in 1 blocks are still reachable in loss record 2 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10D231: ft_itoa (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10A616: update_shlvl (env_init.c:77)
-==2603534==    by 0x10A719: init_env (env_init.c:98)
-==2603534==    by 0x109735: main (main.c:95)
-==2603534== 
-==2603534== 2 bytes in 1 blocks are still reachable in loss record 3 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10DA65: ft_strdup (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10D206: ft_itoa (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10B08F: update_exit_status (execute_utils.c:38)
-==2603534==    by 0x10B29D: wait_for_children (execute_utils.c:94)
-==2603534==    by 0x10AFB8: execute_pipeline (execute.c:122)
-==2603534==    by 0x10965E: process_input (main.c:65)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 2 bytes in 1 blocks are still reachable in loss record 4 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10DA65: ft_strdup (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10B107: update_exit_status (execute_utils.c:52)
-==2603534==    by 0x10B29D: wait_for_children (execute_utils.c:94)
-==2603534==    by 0x10AFB8: execute_pipeline (execute.c:122)
-==2603534==    by 0x10965E: process_input (main.c:65)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 7 bytes in 2 blocks are still reachable in loss record 6 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10DA65: ft_strdup (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10CE91: ft_lexernew (utils.c:11)
-==2603534==    by 0x10C06A: handle_word (lexer.c:81)
-==2603534==    by 0x10C16D: tokenizer (lexer.c:100)
-==2603534==    by 0x109576: get_tokens (main.c:37)
-==2603534==    by 0x109619: process_input (main.c:56)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 7 bytes in 2 blocks are still reachable in loss record 7 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10DA65: ft_strdup (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10C8CE: handle_token (parsing.c:53)
-==2603534==    by 0x10CA5B: parse (parsing.c:99)
-==2603534==    by 0x109632: process_input (main.c:59)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 24 bytes in 1 blocks are still reachable in loss record 20 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10C9BF: parse_init (parsing.c:76)
-==2603534==    by 0x10CA20: parse (parsing.c:92)
-==2603534==    by 0x109632: process_input (main.c:59)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 24 bytes in 1 blocks are still reachable in loss record 21 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10A452: new_env_node (env_init.c:19)
-==2603534==    by 0x10B119: update_exit_status (execute_utils.c:52)
-==2603534==    by 0x10B29D: wait_for_children (execute_utils.c:94)
-==2603534==    by 0x10AFB8: execute_pipeline (execute.c:122)
-==2603534==    by 0x10965E: process_input (main.c:65)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 48 bytes in 1 blocks are still reachable in loss record 27 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10CC0E: init_cmd (parse_utils1.c:57)
-==2603534==    by 0x10C987: parse_init (parsing.c:72)
-==2603534==    by 0x10CA20: parse (parsing.c:92)
-==2603534==    by 0x109632: process_input (main.c:59)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 48 bytes in 2 blocks are still reachable in loss record 28 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10CE6C: ft_lexernew (utils.c:7)
-==2603534==    by 0x10C06A: handle_word (lexer.c:81)
-==2603534==    by 0x10C16D: tokenizer (lexer.c:100)
-==2603534==    by 0x109576: get_tokens (main.c:37)
-==2603534==    by 0x109619: process_input (main.c:56)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 608 bytes in 1 blocks are still reachable in loss record 39 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10A972: env_list_to_envp (env_utils.c:83)
-==2603534==    by 0x10AF05: execute_pipeline (execute.c:107)
-==2603534==    by 0x10965E: process_input (main.c:65)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== 1,054 bytes in 74 blocks are still reachable in loss record 50 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10D671: ft_substr (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10A547: parse_and_add_env (env_init.c:54)
-==2603534==    by 0x10A6F1: init_env (env_init.c:97)
-==2603534==    by 0x109735: main (main.c:95)
-==2603534== 
-==2603534== 1,776 bytes in 74 blocks are still reachable in loss record 53 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10A452: new_env_node (env_init.c:19)
-==2603534==    by 0x10A5A4: parse_and_add_env (env_init.c:62)
-==2603534==    by 0x10A6F1: init_env (env_init.c:97)
-==2603534==    by 0x109735: main (main.c:95)
-==2603534== 
-==2603534== 3,269 bytes in 72 blocks are still reachable in loss record 56 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10D671: ft_substr (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10A573: parse_and_add_env (env_init.c:55)
-==2603534==    by 0x10A6F1: init_env (env_init.c:97)
-==2603534==    by 0x109735: main (main.c:95)
-==2603534== 
-==2603534== 4,330 bytes in 75 blocks are still reachable in loss record 68 of 82
-==2603534==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2603534==    by 0x10D3BD: ft_strjoin (in /home/mwei/42Projects/merge_shell/minishell)
-==2603534==    by 0x10A9EC: env_list_to_envp (env_utils.c:92)
-==2603534==    by 0x10AF05: execute_pipeline (execute.c:107)
-==2603534==    by 0x10965E: process_input (main.c:65)
-==2603534==    by 0x1096ED: shell_loop (main.c:83)
-==2603534==    by 0x109745: main (main.c:96)
-==2603534== 
-==2603534== LEAK SUMMARY:
-==2603534==    definitely lost: 0 bytes in 0 blocks
-==2603534==    indirectly lost: 0 bytes in 0 blocks
-==2603534==      possibly lost: 0 bytes in 0 blocks
-==2603534==    still reachable: 11,202 bytes in 309 blocks
-==2603534==         suppressed: 208,310 bytes in 232 blocks
-==2603534== 
-==2603534== For lists of detected and suppressed errors, rerun with: -s
-==2603534== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==2623679== Memcheck, a memory error detector
+==2623679== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2623679== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==2623679== Command: ./minishell
+==2623679== Parent PID: 2623678
+==2623679== 
+==2623679== 
+==2623679== FILE DESCRIPTORS: 8 open (3 std) at exit.
+==2623679== Open file descriptor 103: /usr/share/code/v8_context_snapshot.bin
+==2623679==    <inherited from parent>
+==2623679== 
+==2623679== Open file descriptor 45: /home/mwei/.config/Code/logs/20260708T130346/ptyhost.log
+==2623679==    <inherited from parent>
+==2623679== 
+==2623679== Open pf-16 socket 38:
+==2623679==    <inherited from parent>
+==2623679== 
+==2623679== Open file descriptor 37:
+==2623679==    <inherited from parent>
+==2623679== 
+==2623679== Open file descriptor 3: /home/mwei/42Projects/merge_shell/valgrind.log
+==2623679==    <inherited from parent>
+==2623679== 
+==2623679== 
+==2623679== HEAP SUMMARY:
+==2623679==     in use at exit: 208,212 bytes in 225 blocks
+==2623679==   total heap usage: 814 allocs, 589 frees, 241,064 bytes allocated
+==2623679== 
+==2623679== LEAK SUMMARY:
+==2623679==    definitely lost: 0 bytes in 0 blocks
+==2623679==    indirectly lost: 0 bytes in 0 blocks
+==2623679==      possibly lost: 0 bytes in 0 blocks
+==2623679==    still reachable: 0 bytes in 0 blocks
+==2623679==         suppressed: 208,212 bytes in 225 blocks
+==2623679== 
+==2623679== For lists of detected and suppressed errors, rerun with: -s
+==2623679== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 14:45:38 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:16:40 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/08 14:10:44 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,6 @@ int	execute_builtin(t_cmd *cmd, char **envp, t_env **env_list)
 	if (ft_strncmp(cmd->argv[0], "env", 4) == 0)
 		return (ft_env(env_list));
 	if (ft_strncmp(cmd->argv[0], "exit", 5) == 0)
-	{
-		ft_exit(cmd);
-		return (0);
-	}
+		return (ft_exit(cmd, env_list));
 	return (127);
 }

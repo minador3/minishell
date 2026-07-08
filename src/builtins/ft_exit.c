@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:24 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/23 17:29:20 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/08 14:39:21 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,10 @@ static int	is_numeric(char *str)
 	return (1);
 }
 
-void	ft_exit(t_cmd *cmd)
+int	ft_exit(t_cmd *cmd, t_env **env)
 {
 	int	code;
 
-	code = 0;
 	printf("exit\n");
 	if (cmd->argv[1])
 	{
@@ -42,14 +41,18 @@ void	ft_exit(t_cmd *cmd)
 		{
 			printf("minishell: exit: %s: numeric argument required\n",
 				cmd->argv[1]);
-			exit(255);
+			update_exit_status(env, 255);
+			return (-2);
 		}
 		if (cmd->argv[2])
 		{
 			printf("minishell: exit: too many arguments\n");
-			return ;
+			return (1);
 		}
 		code = ft_atoi(cmd->argv[1]);
 	}
-	exit(code);
+	else
+		code = ft_atoi(env_get_value(*env, "?"));
+	update_exit_status(env, code);
+	return (-2);
 }

@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/07 23:40:30 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/08 14:17:03 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ static int	handle_parent_builtin(t_cmd *cmd, t_env **env, char **envp,
 {
 	int original_stdout;
 	int original_stdin;
+	int status;
 	if (!cmd->next && prev == -1 && cmd->argv && is_builtin(cmd->argv[0]))
 	{
 		// 1. Save original file descriptors
@@ -24,16 +25,18 @@ static int	handle_parent_builtin(t_cmd *cmd, t_env **env, char **envp,
 		original_stdin = dup(STDIN_FILENO);
 		// 2. Apply ALL redirections (input and output)
 		handle_redirections(cmd, *env); 
-		// 3. Execute the builtin
-		update_exit_status(env, execute_builtin(cmd, envp, env));
+		status = execute_builtin(cmd, envp, env);
+		if (status != -2) // Only update if not exiting
+			update_exit_status(env, status);
 		// 4. Restore original file descriptors
 		dup2(original_stdout, STDOUT_FILENO);
 		dup2(original_stdin, STDIN_FILENO);
 		// 5. Close the duplicates
 		close(original_stdout);
 		close(original_stdin);
-		
 		free_envp_array(envp);
+		if (status == -2)
+			return (-2); //signal to exit
 		return (1);
 	}
 	return (0);
@@ -69,6 +72,7 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 {
 	char	*path;
 	struct stat	path_stat;
+	int ret;
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
@@ -77,7 +81,12 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 	if (cmd->argv == NULL || cmd->argv[0] == NULL)
 		exit(0);
 	if (is_builtin(cmd->argv[0]))
-		exit(execute_builtin(cmd, envp, env)) ;
+	{
+		ret = execute_builtin(cmd, envp, env);
+		if (ret == -2)
+			exit(ft_atoi(env_get_value(*env, "?")));
+		exit(ret);
+	}
 	path = get_path(cmd->argv[0], envp);
 	if (!path){
 		if (ft_strchr(cmd->argv[0], '/') || env_get_value(*env, "PATH") == NULL)
@@ -94,18 +103,22 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 	exit(126);
 }
 
-void	execute_pipeline(t_cmd *cmd, t_env **env_list)
+int	execute_pipeline(t_cmd *cmd, t_env **env_list)
 {
 	int		p[3];
 	pid_t	pid;
 	char	**envp;
+	int ret;
 
 	p[2] = -1;
 	pid = -1;
 	while (cmd != NULL)
 	{
 		envp = env_list_to_envp(*env_list);
-		if (handle_parent_builtin(cmd, env_list, envp, p[2]))
+		ret = handle_parent_builtin(cmd, env_list, envp, p[2]);
+		if (ret == -2)
+			return (-2);
+		if (ret == 1)
 		{
 			cmd = cmd->next;
 			continue ;
@@ -120,4 +133,5 @@ void	execute_pipeline(t_cmd *cmd, t_env **env_list)
 		cmd = cmd->next;
 	}
 	wait_for_children(pid, env_list);
+	return (0);
 }

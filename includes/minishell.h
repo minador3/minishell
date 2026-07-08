@@ -59,7 +59,7 @@ typedef struct s_word
 }   t_word;
 
 // --- Execution Prototypes ---
-void				execute_pipeline(t_cmd *cmd_list, t_env **env_list);
+int				execute_pipeline(t_cmd *cmd_list, t_env **env_list);
 char				*get_path(char *cmd, char **envp);
 void				handle_redirections(t_cmd *cmd, t_env *env_list);
 int					process_heredoc(char *delimiter, t_env *env_list);
@@ -77,7 +77,7 @@ int     ft_pwd(void);
 int     ft_cd(t_cmd *cmd, t_env **env_list);
 int     ft_echo(t_cmd *cmd);
 int     ft_env(t_env **env_list);
-void    ft_exit(t_cmd *cmd);
+int    ft_exit(t_cmd *cmd, t_env **env);
 int     ft_export(t_cmd *cmd, t_env **env_list);
 int     ft_unset(t_cmd *cmd, t_env **env_list);
 
