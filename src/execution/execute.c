@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/08 14:17:03 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/09 17:44:53 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,23 +83,26 @@ static void	execute_child(t_cmd *cmd, t_env **env, char **envp, int p[3])
 	if (is_builtin(cmd->argv[0]))
 	{
 		ret = execute_builtin(cmd, envp, env);
+		free_envp_array(envp);
 		if (ret == -2)
 			exit(ft_atoi(env_get_value(*env, "?")));
 		exit(ret);
 	}
 	path = get_path(cmd->argv[0], envp);
-	if (!path){
+	if (!path)
+	{
 		if (ft_strchr(cmd->argv[0], '/') || env_get_value(*env, "PATH") == NULL)
-			cmd_error_exit(cmd->argv[0], ": No such file or directory", NULL, 127);
+			cmd_error_exit(cmd->argv[0], ": No such file or directory", NULL, envp, 127);
 		else
-			cmd_error_exit(cmd->argv[0], ": command not found", NULL, 127);
+			cmd_error_exit(cmd->argv[0], ": command not found", NULL, envp, 127);
 	}
 	if (stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
-		cmd_error_exit(path, ": Is a directory", path, 126);
+		cmd_error_exit(path, ": Is a directory", path, envp, 126);
 	execve(path, cmd->argv, envp);
 	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	perror(path);
 	free(path);
+	free_envp_array(envp);
 	exit(126);
 }
 
@@ -117,9 +120,13 @@ int	execute_pipeline(t_cmd *cmd, t_env **env_list)
 		envp = env_list_to_envp(*env_list);
 		ret = handle_parent_builtin(cmd, env_list, envp, p[2]);
 		if (ret == -2)
+		{
+			free_envp_array(envp);
 			return (-2);
+		}
 		if (ret == 1)
 		{
+			free_envp_array(envp);
 			cmd = cmd->next;
 			continue ;
 		}

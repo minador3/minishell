@@ -68,7 +68,7 @@ void				update_exit_status(t_env **env_list, int status);
 void				free_envp_array(char **envp);
 void				wait_for_children(pid_t last_pid, t_env **env_list);
 void	print_cmd_error(char *cmd, char *msg);
-void	cmd_error_exit(char *cmd, char *msg, char *path, int code);
+void	cmd_error_exit(char *cmd, char *msg, char *path, char **envp, int code);
 
 // --- Builtin Prototypes ---
 int     is_builtin(char *cmd_name);

@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/23 17:00:51 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/07 19:13:27 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/09 17:40:54 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,13 @@ void	print_cmd_error(char *cmd, char *msg)
 		ft_putendl_fd(msg, STDERR_FILENO);
 }
 
-void	cmd_error_exit(char *cmd, char *msg, char *path, int code)
+void	cmd_error_exit(char *cmd, char *msg, char *path, char **envp, int code)
 {
 	print_cmd_error(cmd, msg);
 	if (path)
 		free(path);
+	if (envp)
+		free_envp_array(envp);
 	exit(code);
 }
 
