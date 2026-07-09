@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/23 17:00:51 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/09 17:40:54 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/09 18:46:57 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,8 @@ void	update_exit_status(t_env **env_list, int status)
 	{
 		if (ft_strncmp(temp->key, "?", 2) == 0)
 		{
-			free(temp->value);
+			if (temp->value)
+				free(temp->value);
 			temp->value = status_str;
 			return ;
 		}

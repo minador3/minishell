@@ -15,7 +15,9 @@ void	expand_exit_status(t_word *w, int *j)
 	*j += 2;
 	val = env_get_value(w->env_list, "?");
 	if (!val)
-		return ;
+	{
+		val = "0";
+	}
 	i = 0;
 	while (val[i])
 		w->str[w->k++] = val[i++];

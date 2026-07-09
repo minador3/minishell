@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/23 17:03:36 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/08 14:21:32 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/09 19:23:48 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,9 @@ int	process_input(char *input, t_env **env_list)
 		ft_listclear(&token);
 		return (0);
 	}
+	ft_listclear(&token);
 	ret = execute_pipeline(cmd, env_list);
 	free_cmd(cmd);
-	ft_listclear(&token);
 	return (ret);
 }
 
@@ -104,6 +104,8 @@ int	main(int ac, char **av, char **env)
 	setup_signals();
 	my_env = init_env(env);
 	shell_loop(&my_env);
+	/* Free readline history allocated by the readline library */
+	rl_clear_history();
 	val = env_get_value(my_env, "?");
 	code = 0;
 	if (val)

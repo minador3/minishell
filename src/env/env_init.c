@@ -6,7 +6,7 @@
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 16:15:34 by mwei              #+#    #+#             */
-/*   Updated: 2026/06/29 14:48:54 by mwei             ###   ########.fr       */
+/*   Updated: 2026/07/09 18:46:55 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,5 +96,6 @@ t_env	*init_env(char **envp)
 	while (envp[i])
 		parse_and_add_env(&env, envp[i++]);
 	update_shlvl(&env);
+	env_add_back(&env, new_env_node(ft_strdup("?"), ft_strdup("0")));
 	return (env);
 }

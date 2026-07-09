@@ -123,6 +123,7 @@ void    ft_lexeradd_back(t_token **head, t_token *new);
 void	ft_listclear(t_token **lst);
 void	ft_listdelone(t_token *lst);
 void	free_cmd(t_cmd *cmd);
+void	free_env_list(t_env *env_list);
 
 void	shell_loop(t_env **env_list);
 t_token	*tokenizer(char *line, t_env *env_list);
