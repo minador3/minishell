@@ -127,5 +127,7 @@ void	free_cmd(t_cmd *cmd);
 void	shell_loop(t_env **env_list);
 t_token	*tokenizer(char *line, t_env *env_list);
 
+char	*realloc_word_buffer(char *old, int k, int new_size);
+
 
 #endif

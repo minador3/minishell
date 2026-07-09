@@ -59,6 +59,7 @@ void	expand_variable(t_word *w, char *line, int *j)
 	free(tmp);
 	if (!val)
 		return ;
+	w->str = realloc_word_buffer(w->str, w->k, ft_strlen(line) + ft_strlen(val) + w->k + 1);
 	m = 0;
 	while (val[m])
 		w->str[w->k++] = val[m++];
