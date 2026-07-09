@@ -5,33 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/23 17:00:51 by mwei              #+#    #+#             */
-/*   Updated: 2026/07/09 18:46:57 by mwei             ###   ########.fr       */
+/*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
+/*   Updated: 2026/07/09 19:37:39 by mwei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_cmd_error(char *cmd, char *msg)
-{
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
-	if (cmd)
-		ft_putstr_fd(cmd, STDERR_FILENO);
-	if (msg)
-		ft_putendl_fd(msg, STDERR_FILENO);
-}
-
-void	cmd_error_exit(char *cmd, char *msg, char *path, char **envp, int code)
-{
-	print_cmd_error(cmd, msg);
-	if (path)
-		free(path);
-	if (envp)
-		free_envp_array(envp);
-	exit(code);
-}
-
-// 1. Condense the exit status updater
 void	update_exit_status(t_env **env_list, int status)
 {
 	char	*status_str;
@@ -55,20 +35,6 @@ void	update_exit_status(t_env **env_list, int status)
 	env_add_back(env_list, new_env_node(ft_strdup("?"), status_str));
 }
 
-// 2. Helper to free the char ** array to save lines in the main loop
-void	free_envp_array(char **envp)
-{
-	int	i;
-
-	i = 0;
-	if (!envp)
-		return ;
-	while (envp[i])
-		free(envp[i++]);
-	free(envp);
-}
-
-// 3. Isolated waiting logic
 void	wait_for_children(pid_t last_pid, t_env **env_list)
 {
 	int	status;
@@ -95,4 +61,38 @@ void	wait_for_children(pid_t last_pid, t_env **env_list)
 		;
 	setup_signals();
 	update_exit_status(env_list, final);
+}
+
+void	setup_child_pipes(t_cmd *cmd, int p[3])
+{
+	if (p[2] != -1)
+	{
+		dup2(p[2], STDIN_FILENO);
+		close(p[2]);
+	}
+	if (cmd->next != NULL)
+	{
+		dup2(p[1], STDOUT_FILENO);
+		close(p[1]);
+		close(p[0]);
+	}
+}
+
+void	child_cleanup(t_cmd *cmd, t_env **env, char **envp)
+{
+	free_cmd(cmd);
+	free_envp_array(envp);
+	if (env && *env)
+		free_env_list(*env);
+}
+
+void	handle_parent_process(t_cmd *cmd, int p[3])
+{
+	if (p[2] != -1)
+		close(p[2]);
+	if (cmd->next != NULL)
+	{
+		p[2] = p[0];
+		close(p[1]);
+	}
 }

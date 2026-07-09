@@ -64,9 +64,16 @@ clean:
 	@make -C $(LIBFT_DIR) clean
 
 fclean: clean
-	@rm -f $(NAME)
+	@rm -f $(NAME) test_minishell
 	@make -C $(LIBFT_DIR) fclean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+TEST_NAME = test_minishell
+TEST_OBJS = $(filter-out $(OBJ_DIR)/main.o, $(OBJS))
+
+test: $(LIBFT) $(TEST_OBJS)
+	$(CC) $(CFLAGS) $(INCLUDES) test_minishell.c $(TEST_OBJS) $(LIBFT_FLAGS) -lreadline -o $(TEST_NAME)
+	valgrind --suppressions=readline.supp --show-leak-kinds=all --leak-check=full ./$(TEST_NAME)
+
+.PHONY: all clean fclean re test

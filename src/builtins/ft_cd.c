@@ -26,22 +26,28 @@ static char	*get_env_val(t_env *env, char *key)
 int	ft_cd(t_cmd *cmd, t_env **env)
 {
 	char	*path;
+	char	old_cwd[1024];
+	char	new_cwd[1024];
 
+	old_cwd[0] = '\0';
+	getcwd(old_cwd, 1024);
 	if (cmd->argv[1] == NULL)
-	{
 		path = get_env_val(*env, "HOME");
-		if (!path)
-		{
-			printf("minishell: cd: HOME not set\n");
-			return (1);
-		}
-	}
 	else
 		path = cmd->argv[1];
+	if (!path)
+	{
+		printf("minishell: cd: HOME not set\n");
+		return (1);
+	}
 	if (chdir(path) != 0)
 	{
 		perror("minishell: cd");
 		return (1);
 	}
+	if (old_cwd[0] != '\0')
+		env_set_value(env, "OLDPWD", old_cwd);
+	if (getcwd(new_cwd, sizeof(new_cwd)) != NULL)
+		env_set_value(env, "PWD", new_cwd);
 	return (0);
 }

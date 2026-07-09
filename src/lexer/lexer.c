@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexer.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/10 16:15:40 by mwei              #+#    #+#             */
+/*   Updated: 2026/07/09 20:51:14 by mwei             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	handle_operator(t_token **token, char *line, int *j)
@@ -54,14 +66,6 @@ void	handle_heredoc(t_token **token, char *line, int *j)
 	free(tmp);
 }
 
-void	handle_expansion(t_word *w, char *line, int *j)
-{
-	if (line[*j + 1] == '?')
-		expand_exit_status(w, j);
-	else
-		expand_variable(w, line, j);
-}
-
 void	handle_word(t_token **token, char *line, int *j, t_env *env_list)
 {
 	t_word	w;
@@ -69,6 +73,7 @@ void	handle_word(t_token **token, char *line, int *j, t_env *env_list)
 
 	w.k = 0;
 	w.quote_state = 0;
+	w.has_quotes = 0;
 	w.env_list = env_list;
 	w.str = malloc(ft_strlen(line) + 1);
 	if (!w.str)
@@ -78,8 +83,11 @@ void	handle_word(t_token **token, char *line, int *j, t_env *env_list)
 	}
 	fill_word(&w, line, j);
 	w.str[w.k] = '\0';
-	new = ft_lexernew(WORD, w.str);
-	ft_lexeradd_back(token, new);
+	if (w.k > 0 || w.has_quotes)
+	{
+		new = ft_lexernew(WORD, w.str);
+		ft_lexeradd_back(token, new);
+	}
 	free(w.str);
 }
 
@@ -104,4 +112,23 @@ t_token	*tokenizer(char *line, t_env *env_list)
 			handle_operator(&token, line, &j);
 	}
 	return (token);
+}
+
+char	*realloc_word_buffer(char *old, int k, int new_size)
+{
+	char	*new_str;
+	int		i;
+
+	new_str = malloc(new_size);
+	if (!new_str)
+		return (NULL);
+	i = 0;
+	while (i < k)
+	{
+		new_str[i] = old[i];
+		i++;
+	}
+	new_str[i] = '\0';
+	free(old);
+	return (new_str);
 }

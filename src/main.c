@@ -49,7 +49,7 @@ int	process_input(char *input, t_env **env_list)
 {
 	t_cmd	*cmd;
 	t_token	*token;
-	int ret;
+	int		ret;
 
 	token = NULL;
 	cmd = NULL;
@@ -64,6 +64,11 @@ int	process_input(char *input, t_env **env_list)
 		return (0);
 	}
 	ft_listclear(&token);
+	if (preprocess_heredocs(cmd, env_list) == -1)
+	{
+		free_cmd(cmd);
+		return (0);
+	}
 	ret = execute_pipeline(cmd, env_list);
 	free_cmd(cmd);
 	return (ret);
@@ -96,15 +101,14 @@ void	shell_loop(t_env **env_list)
 int	main(int ac, char **av, char **env)
 {
 	t_env	*my_env;
-	char *val;
-	int code;
+	char	*val;
+	int		code;
 
 	(void)ac;
 	(void)av;
 	setup_signals();
 	my_env = init_env(env);
 	shell_loop(&my_env);
-	/* Free readline history allocated by the readline library */
 	rl_clear_history();
 	val = env_get_value(my_env, "?");
 	code = 0;

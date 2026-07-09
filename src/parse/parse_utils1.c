@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_utils1.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/10 16:15:37 by mwei              #+#    #+#             */
+/*   Updated: 2026/07/09 20:49:55 by mwei             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	is_redirection(int type)
@@ -62,6 +74,7 @@ t_cmd	*init_cmd(void)
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
 	cmd->heredoc = NULL;
+	cmd->heredoc_fd = -1;
 	cmd->next = NULL;
 	return (cmd);
 }

@@ -86,14 +86,12 @@ char	**env_list_to_envp(t_env *env)
 	i = 0;
 	while (env)
 	{
-		if (env->value)
+		if (env->value != NULL && ft_strncmp(env->key, "?", 2) != 0)
 		{
 			join = ft_strjoin(env->key, "=");
 			envp[i++] = ft_strjoin(join, env->value);
 			free(join);
 		}
-		else
-			envp[i++] = ft_strdup(env->key);
 		env = env->next;
 	}
 	envp[i] = NULL;

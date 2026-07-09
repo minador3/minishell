@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/26 15:26:53 by mwei              #+#    #+#             */
+/*   Updated: 2026/07/09 19:37:39 by mwei             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_token	*ft_lexernew(int type, char *str)
@@ -33,25 +45,18 @@ void	ft_lexeradd_back(t_token **head, t_token *new)
 
 void	ft_listclear(t_token **lst)
 {
-	t_token	*n;
+	t_token	*temp;
 
-	if (*lst == NULL)
+	if (!lst || !*lst)
 		return ;
 	while (*lst)
 	{
-		n = (*lst)->next;
-		ft_listdelone(*lst);
-		*lst = n;
+		temp = (*lst)->next;
+		free((*lst)->value);
+		free(*lst);
+		*lst = temp;
 	}
 	*lst = NULL;
-}
-
-void	ft_listdelone(t_token *lst)
-{
-	if (lst == NULL)
-		return ;
-	free(lst->value);
-	free(lst);
 }
 
 void	free_cmd(t_cmd *cmd)
@@ -74,27 +79,22 @@ void	free_cmd(t_cmd *cmd)
 		free(cmd->input_file);
 		free(cmd->output_file);
 		free(cmd->heredoc);
+		if (cmd->heredoc_fd != -1)
+			close(cmd->heredoc_fd);
 		tmp = cmd->next;
 		free(cmd);
 		cmd = tmp;
 	}
 }
 
-char	*realloc_word_buffer(char *old, int k, int new_size)
+void	free_envp_array(char **envp)
 {
-	char	*new_str;
-	int		i;
+	int	i;
 
-	new_str = malloc(new_size);
-	if (!new_str)
-		return (NULL);
 	i = 0;
-	while (i < k)
-	{
-		new_str[i] = old[i];
-		i++;
-	}
-	new_str[i] = '\0';
-	free(old);
-	return (new_str);
+	if (!envp)
+		return ;
+	while (envp[i])
+		free(envp[i++]);
+	free(envp);
 }

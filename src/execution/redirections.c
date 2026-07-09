@@ -16,14 +16,12 @@ static void	handle_input(t_cmd *cmd, t_env *env_list)
 {
 	int	fd;
 
-	if (cmd->heredoc != NULL)
+	(void)env_list;
+	if (cmd->heredoc_fd != -1)
 	{
-		fd = process_heredoc(cmd->heredoc, env_list);
-		if (fd != -1)
-		{
-			dup2(fd, STDIN_FILENO);
-			close(fd);
-		}
+		dup2(cmd->heredoc_fd, STDIN_FILENO);
+		close(cmd->heredoc_fd);
+		cmd->heredoc_fd = -1;
 	}
 	else if (cmd->input_file != NULL)
 	{

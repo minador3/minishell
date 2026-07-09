@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexer_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mwei <mwei@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/10 16:15:37 by mwei              #+#    #+#             */
+/*   Updated: 2026/07/09 20:49:55 by mwei             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	types(char c)
@@ -61,7 +73,8 @@ void	expand_variable(t_word *w, char *line, int *j)
 	free(tmp);
 	if (!val)
 		return ;
-	w->str = realloc_word_buffer(w->str, w->k, ft_strlen(line) + ft_strlen(val) + w->k + 1);
+	w->str = realloc_word_buffer(w->str, w->k,
+			ft_strlen(line) + ft_strlen(val) + w->k + 1);
 	m = 0;
 	while (val[m])
 		w->str[w->k++] = val[m++];
@@ -72,12 +85,21 @@ void	fill_word(t_word *w, char *line, int *j)
 	while (line[*j] && (w->quote_state || !types(line[*j])))
 	{
 		if (w->quote_state == 0 && (line[*j] == '\'' || line[*j] == '"'))
+		{
 			w->quote_state = line[*j];
+			w->has_quotes = 1;
+		}
 		else if (w->quote_state == line[*j])
+		{
 			w->quote_state = 0;
+			w->has_quotes = 1;
+		}
 		else if (line[*j] == '$' && w->quote_state != '\'')
 		{
-			handle_expansion(w, line, j);
+			if (line[*j + 1] == '?')
+				expand_exit_status(w, j);
+			else
+				expand_variable(w, line, j);
 			continue ;
 		}
 		else
