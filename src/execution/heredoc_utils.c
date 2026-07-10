@@ -52,6 +52,12 @@ static char	*append_text(char *line, int *i, char *res)
 	char	*temp;
 
 	start = *i;
+	if (line[*i] == '$')
+	{
+		res = append_str(res, "$");
+		(*i)++;
+		return (res);
+	}
 	while (line[*i] && line[*i] != '$')
 		(*i)++;
 	temp = ft_substr(line, start, *i - start);
