@@ -1,146 +1,46 @@
-==2855233== Memcheck, a memory error detector
-==2855233== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==2855233== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
-==2855233== Command: ./minishell
-==2855233== Parent PID: 2855232
-==2855233== 
-==2855233== Invalid read of size 8
-==2855233==    at 0x10D6C3: free_envp_array (utils.c:97)
-==2855233==    by 0x10B22B: execute_single_cmd (execute.c:108)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Address 0x4b77d20 is 0 bytes inside a block of size 608 free'd
-==2855233==    at 0x484B27F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10D6D6: free_envp_array (utils.c:99)
-==2855233==    by 0x10AE76: handle_parent_builtin (execute.c:34)
-==2855233==    by 0x10B216: execute_single_cmd (execute.c:105)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Block was alloc'd at
-==2855233==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10AC93: env_list_to_envp (env_utils.c:83)
-==2855233==    by 0x10B1F4: execute_single_cmd (execute.c:104)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233== 
-==2855233== Invalid read of size 8
-==2855233==    at 0x10D6A4: free_envp_array (utils.c:98)
-==2855233==    by 0x10B22B: execute_single_cmd (execute.c:108)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Address 0x4b77d20 is 0 bytes inside a block of size 608 free'd
-==2855233==    at 0x484B27F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10D6D6: free_envp_array (utils.c:99)
-==2855233==    by 0x10AE76: handle_parent_builtin (execute.c:34)
-==2855233==    by 0x10B216: execute_single_cmd (execute.c:105)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Block was alloc'd at
-==2855233==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10AC93: env_list_to_envp (env_utils.c:83)
-==2855233==    by 0x10B1F4: execute_single_cmd (execute.c:104)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233== 
-==2855233== Invalid free() / delete / delete[] / realloc()
-==2855233==    at 0x484B27F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10D6AE: free_envp_array (utils.c:98)
-==2855233==    by 0x10B22B: execute_single_cmd (execute.c:108)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Address 0x4b78020 is 0 bytes inside a block of size 33 free'd
-==2855233==    at 0x484B27F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10D6AE: free_envp_array (utils.c:98)
-==2855233==    by 0x10AE76: handle_parent_builtin (execute.c:34)
-==2855233==    by 0x10B216: execute_single_cmd (execute.c:105)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Block was alloc'd at
-==2855233==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10D9F7: ft_strjoin (in /home/mwei/42Projects/merge_shell/minishell)
-==2855233==    by 0x10AD2C: env_list_to_envp (env_utils.c:92)
-==2855233==    by 0x10B1F4: execute_single_cmd (execute.c:104)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233== 
-==2855233== Invalid free() / delete / delete[] / realloc()
-==2855233==    at 0x484B27F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10D6D6: free_envp_array (utils.c:99)
-==2855233==    by 0x10B22B: execute_single_cmd (execute.c:108)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Address 0x4b77d20 is 0 bytes inside a block of size 608 free'd
-==2855233==    at 0x484B27F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10D6D6: free_envp_array (utils.c:99)
-==2855233==    by 0x10AE76: handle_parent_builtin (execute.c:34)
-==2855233==    by 0x10B216: execute_single_cmd (execute.c:105)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233==  Block was alloc'd at
-==2855233==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==2855233==    by 0x10AC93: env_list_to_envp (env_utils.c:83)
-==2855233==    by 0x10B1F4: execute_single_cmd (execute.c:104)
-==2855233==    by 0x10B319: execute_pipeline (execute.c:137)
-==2855233==    by 0x1096C4: process_input (main.c:72)
-==2855233==    by 0x10974A: shell_loop (main.c:91)
-==2855233==    by 0x1097B5: main (main.c:111)
-==2855233== 
-==2855233== 
-==2855233== FILE DESCRIPTORS: 10 open (3 std) at exit.
-==2855233== Open file descriptor 103: /usr/share/code/v8_context_snapshot.bin
-==2855233==    <inherited from parent>
-==2855233== 
-==2855233== Open file descriptor 48: /dev/ptmx
-==2855233==    <inherited from parent>
-==2855233== 
-==2855233== Open AF_UNIX socket 45: <unknown>
-==2855233==    <inherited from parent>
-==2855233== 
-==2855233== Open file descriptor 44: /home/mwei/.config/Code/logs/20260709T181917/ptyhost.log
-==2855233==    <inherited from parent>
-==2855233== 
-==2855233== Open file descriptor 37:
-==2855233==    <inherited from parent>
-==2855233== 
-==2855233== Open pf-16 socket 36:
-==2855233==    <inherited from parent>
-==2855233== 
-==2855233== Open file descriptor 3: /home/mwei/42Projects/merge_shell/valgrind.log
-==2855233==    <inherited from parent>
-==2855233== 
-==2855233== 
-==2855233== HEAP SUMMARY:
-==2855233==     in use at exit: 208,171 bytes in 222 blocks
-==2855233==   total heap usage: 1,495 allocs, 1,348 frees, 267,055 bytes allocated
-==2855233== 
-==2855233== LEAK SUMMARY:
-==2855233==    definitely lost: 0 bytes in 0 blocks
-==2855233==    indirectly lost: 0 bytes in 0 blocks
-==2855233==      possibly lost: 0 bytes in 0 blocks
-==2855233==    still reachable: 0 bytes in 0 blocks
-==2855233==         suppressed: 208,171 bytes in 222 blocks
-==2855233== 
-==2855233== For lists of detected and suppressed errors, rerun with: -s
-==2855233== ERROR SUMMARY: 224 errors from 4 contexts (suppressed: 0 from 0)
+==2914707== Memcheck, a memory error detector
+==2914707== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2914707== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==2914707== Command: ./minishell
+==2914707== Parent PID: 2914706
+==2914707== 
+==2914707== 
+==2914707== FILE DESCRIPTORS: 11 open (3 std) at exit.
+==2914707== Open file descriptor 103: /usr/share/code/v8_context_snapshot.bin
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== Open file descriptor 47: /dev/ptmx
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== Open file descriptor 45: /home/mwei/.config/Code/logs/20260710T150027/ptyhost.log
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== Open AF_UNIX socket 38: <unknown>
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== Open AF_UNIX socket 37: <unknown>
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== Open pf-16 socket 36:
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== Open file descriptor 35:
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== Open file descriptor 3: /home/mwei/42Projects/merge_shell/valgrind.log
+==2914707==    <inherited from parent>
+==2914707== 
+==2914707== 
+==2914707== HEAP SUMMARY:
+==2914707==     in use at exit: 208,171 bytes in 222 blocks
+==2914707==   total heap usage: 1,198 allocs, 976 frees, 254,534 bytes allocated
+==2914707== 
+==2914707== LEAK SUMMARY:
+==2914707==    definitely lost: 0 bytes in 0 blocks
+==2914707==    indirectly lost: 0 bytes in 0 blocks
+==2914707==      possibly lost: 0 bytes in 0 blocks
+==2914707==    still reachable: 0 bytes in 0 blocks
+==2914707==         suppressed: 208,171 bytes in 222 blocks
+==2914707== 
+==2914707== For lists of detected and suppressed errors, rerun with: -s
+==2914707== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
